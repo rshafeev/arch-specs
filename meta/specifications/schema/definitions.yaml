@@ -1,0 +1,35 @@
+
+definitions:
+  teams:
+    dev_team: &dev_team
+      name: DEV Team
+      lead: Roman Shafeev
+
+  status:
+    ready: &ready "ready"
+    develop: &develop "develop"
+    decommission: &decommission "decommission"
+    deprecated: &deprecated "deprecated"
+    draft: &draft "draft"
+
+  type:
+    db: &db "db"
+    elasticsearch: &elasticsearch "elasticsearch"
+    jaeger: &jaeger  "jaeger"
+    grpc_api: &grpc_api  "grpc_api"
+    kafka: &kafka "kafka"
+    otlp_agent: &otlp_agent  "otlp_agent"
+    s3: &s3 "s3"
+
+  state:
+    stateful: &stateful "stateful"
+    stateless: &stateless "stateless"
+
+  data_direction:
+    rx: &rx "rx"
+    tx: &tx "tx"
+    rx_tx: &rx_tx "rx_tx"
+    kafka_consumer: &kafka_consumer "rx"
+    kafka_producer: &kafka_producer "tx"
+    celery_consumer: &celery_consumer "rx"
+    celery_producer: &celery_producer "tx"

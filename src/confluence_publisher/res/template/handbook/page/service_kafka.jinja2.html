@@ -1,0 +1,22 @@
+<ac:layout>
+    <ac:layout-section ac:type="two_left_sidebar" >
+        <ac:layout-cell>
+            {{service_properties}}
+        </ac:layout-cell>
+        <ac:layout-cell>
+            {{include_page_network_diagram}}
+        </ac:layout-cell>
+    </ac:layout-section>
+    <ac:layout-section ac:type="fixed-width" ac:breakout-mode="default">
+        <ac:layout-cell>
+            <h1>Service Handbook</h1>
+             <p>
+               {{include_page_handbook_manual}}
+            </p>
+            <h2>Network Communication and Stores</h2>
+            <p>
+               {{include_page_network_links}}
+            </p>
+            <p class="auto-cursor-target"><br/></p></ac:layout-cell>
+    </ac:layout-section>
+</ac:layout>

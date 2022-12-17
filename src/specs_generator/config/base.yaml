@@ -1,0 +1,6 @@
+
+logging:
+  level: {{'logging_level'|getenv('INFO')}}
+
+git:
+  branch: {{'git_branch'|getenv('develop')}}

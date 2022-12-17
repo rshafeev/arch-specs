@@ -1,0 +1,99 @@
+# все возможные definitions представлены в файле :schema/definitions.yaml
+# json-схема валидации находится в файле: schema/service.yaml
+definitions:
+  status:
+    ready: &ready "ready"
+    develop: &develop "develop"
+  state:
+    stateless: &stateless "stateless"
+    stateful: &stateful "stateful"
+
+  teams:
+    dev_team: &dev_team
+      name: DEV Team
+      lead: Roman Shafeev
+  type:
+      otlp_agent: &otlp_agent  "otlp_agent"
+      jaeger: &jaeger  "jaeger"
+      elasticsearch: &elasticsearch "elasticsearch"
+
+  data_direction:
+    rx: &rx "rx"
+    tx: &tx "tx"
+    rx_tx: &rx_tx "rx_tx"
+    kafka_consumer: &kafka_consumer "rx"
+    kafka_producer: &kafka_producer "tx"
+
+observability:
+  elasticsearch:
+    desc: Lods/tracing storage
+    module: observability
+    owner: Roman Shafeev
+    status: *ready
+    state: *stateful
+    type: *elasticsearch
+
+  jaeger-collector:
+    desc: |
+      jaeger collector
+    module: observability
+    owner: Roman Shafeev
+    status: *ready
+    state: *stateless
+    type: *jaeger
+    connect_to:
+      - name: kafka
+        data_direction: *kafka_producer
+        topics:
+           jaeger-spans:
+    interfaces:
+      grpc:
+        protocol: jaeger
+
+  jaeger-ingester:
+    desc: |
+      Jaeger ingester
+    module: observability
+    owner: Roman Shafeev
+    status: *ready
+    state: *stateless
+    type: *jaeger
+    connect_to:
+      - name: kafka
+        data_direction: *kafka_consumer
+        offset_storage: kafka
+        topics:
+           jaeger-spans:
+      - name: elasticsearch
+        data_direction: *tx
+        transport: tcp
+
+  jaeger-query:
+    desc: |
+      Jaeger Web UI
+    module: observability
+    owner: Roman Shafeev
+    status: *ready
+    state: *stateless
+    type: *jaeger
+    connect_to:
+      - name: elasticsearch
+        data_direction: *rx
+        protocol: http
+
+  otlp-collector:
+    desc: |
+      Otlp Collector
+    module: observability
+    owner: Roman Shafeev
+    status: *ready
+    state: *stateless
+    type: *otlp_agent
+    connect_to:
+      - name: jaeger-collector
+        desc: send spans to jaeger-collector using grpc-protocol.
+        protocol: grpc
+        data_direction: *tx
+    interfaces:
+      grpc:
+        protocol: open-telemetry

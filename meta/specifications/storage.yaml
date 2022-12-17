@@ -1,0 +1,42 @@
+# все возможные definitions представлены в файле :schema/definitions.yaml
+# json-схема валидации находится в файле: schema/service.yaml
+definitions:
+  teams:
+    dev_team: &dev_team
+      name: DEV Team
+      lead: Roman Shafeev
+  status:
+    ready: &ready "ready"
+    develop: &develop "develop"
+
+  state:
+    stateful: &stateful "stateful"
+  type:
+    db: &db "db"
+    kafka: &kafka "kafka"
+
+storage:
+
+  kafka:
+    type: *kafka
+    status: *ready
+    owner:  Roman Shafeev
+    state: *stateful
+    module: storage
+    topics:
+      jaeger-spans:
+        desc: Jaeger spans
+        protocol: "Jaeger protobuf"
+
+  postgresql:
+    databases:
+       feature_db:
+          desc: some feature data
+    desc: features data storage
+    dev_team:
+      - *dev_team
+    state: *stateful
+    status: *ready
+    type: *db
+    module: storage
+    owner: Roman Shafeev
