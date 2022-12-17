@@ -6,7 +6,6 @@ import os
 from core.app import AppCore
 from core.git.branch import Branch
 from core.git.specs_repo import GitSpecsRepositoryHelper
-from core.specs.specs import ServicesSpecs
 from core.specs.validate.specs_validator import SpecsValidator
 from specs_generator.generator import SpecsGenerator
 
