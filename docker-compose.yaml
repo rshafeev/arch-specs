@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  specs_generator:
+    build:
+      context: src/
+      dockerfile: specs_generator/Dockerfile
+    environment:
+      - meta_path=/meta
+      - output_path=/arch_specs_autogen
+      - logging_level=DEBUG
+    volumes:
+      - ./meta:/meta
+      - ./arch_specs_autogen:/arch_specs_autogen
+
+  diagrams_generator:
+    build:
+      context: src/
+      dockerfile: diagrams_generator/Dockerfile
+    environment:
+      - logging_level=DEBUG
+      - publish_service=${publish_service}
+      - meta_path=/meta
+      - output_path=/arch_specs_autogen
+      - git_branch=${git_branch}
+    volumes:
+      - ./meta:/meta
+      - ./arch_specs_autogen:/arch_specs_autogen
+
+  confluence_publisher:
+    build:
+      context: src/
+      dockerfile: confluence_publisher/Dockerfile
+    environment:
+      - meta_path=/meta
+      - output_path=/arch_specs_autogen
+      - cache_path=/arch_specs_autogen
+      - logging_level=DEBUG
+      - confluence_auth_user=${confluence_auth_user}
+      - confluence_auth_password=${confluence_auth_password}
+      - force_recreate_handbook=0
+      - force_rewrite_handbook_properties=0
+      - force_recreate_network_pages=0
+      - max_releases_cnt=2
+      - max_parallel_tasks_cnt=1
+      - publish_service=${publish_service}
+      - git_branch=${git_branch}
+      - validate_only_flag=${validate_only_flag}
+
+    volumes:
+      - ./meta:/meta
+      - ./arch_specs_autogen:/arch_specs_autogen

@@ -1,0 +1,31 @@
+app:
+  max_parallel_tasks_cnt: {{'max_parallel_tasks_cnt'|getenv('1')}}
+
+publish:
+  force_recreate_handbook: {{'force_recreate_handbook'|getenv('0')}}
+  force_rewrite_handbook_properties: {{'force_rewrite_handbook_properties'|getenv('0')}}
+  force_recreate_network_pages: {{'force_recreate_network_pages'|getenv('0')}}
+  max_releases_cnt: {{'max_releases_cnt'|getenv('2')}}
+  service: {{'publish_service'|getenv('all')}}
+
+git:
+  branch: {{'git_branch'|getenv('develop')}}
+
+confluence:
+  url: {{'confluence_url'|getenv('')}}
+  auth_user: {{'confluence_auth_user'|getenv('')}}
+  auth_password: {{'confluence_auth_password'|getenv('')}}
+  auth_token: {{'confluence_publish_token'|getenv('')}}
+  timeout_secs: 20
+  retries_max: 3
+  retries_delay_secs: 10
+  retries_codes:
+    - 403
+    - 500
+    - 400
+#    - 409
+  transaction_retries_max: 3
+  transaction_retries_delay_secs: 10
+
+logging:
+  level: {{'logging_level'|getenv('INFO')}}

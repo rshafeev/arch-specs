@@ -1,0 +1,89 @@
+<ac:structured-macro ac:name="details" ac:schema-version="1"
+                     ac:macro-id="69a99ad2-87af-4049-9b88-2b98ac10afe6">
+    <ac:parameter ac:name="id">service_handbook</ac:parameter>
+    <ac:parameter ac:name="title">Page properties example</ac:parameter>
+    <ac:rich-text-body>
+        <table class="wrapped relative-table" >
+            <colgroup>
+                <col />
+                <col />
+            </colgroup>
+            <tbody>
+            <tr>
+                <th colspan="1">Name</th>
+                <td colspan="1"><strong><span>{{service_name}}</span><br/></strong></td>
+            </tr>
+            <tr>
+                <th colspan="1">Description</th>
+                <td colspan="1"><span>{{desc}}</span></td>
+            </tr>
+            <tr>
+                <th colspan="1">Type</th>
+                <td colspan="1"><span>{{service_type}}</span></td>
+            </tr>
+            <tr>
+                <th colspan="1">Source Code</th>
+                <td colspan="1">{{source_link}}</td>
+            </tr>
+            {% if has_language %}
+            <tr>
+                <th colspan="1">Basic Language</th>
+                <td colspan="1"><span>{{language}}</span></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th colspan="1">Responsible</th>
+                <td colspan="1">
+                    <div class="content-wrapper">
+                        <p>{{responsible}}</p>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="1">Dev. Team</th>
+                <td colspan="1"><span>{{dev_teams}}</span></td>
+            </tr>
+            <tr>
+                <th colspan="1" update="{{current_time}}">State Storage</th>
+                <td colspan="1">
+                    <span> {{state}} </span>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="1">Module</th>
+                <td colspan="1"><ac:structured-macro ac:name="status" ac:schema-version="1"
+                                                 ac:macro-id="ea1cab98-f702-465e-960c-5c01aab163e7">
+                                <ac:parameter ac:name="colour">{{service_module_colour}}</ac:parameter>
+                                <ac:parameter ac:name="title">{{service_module}}</ac:parameter>
+                                <ac:parameter ac:name=""/>
+                            </ac:structured-macro></td>
+            </tr>
+            <tr>
+                <th>Encryption</th>
+                {% if no_encryption %}
+                    <td colspan="1"> Нет </td>
+                {% else %}
+                    {% for method in encryption %}
+                        <td><ac:structured-macro ac:name="status" ac:schema-version="1"
+                                                         ac:macro-id="25a4c6d5-3ebb-404e-85c6-17f894c782a9">
+                            <ac:parameter ac:name="colour">grey</ac:parameter>
+                            <ac:parameter ac:name="title">{{method}}</ac:parameter>
+                            <ac:parameter ac:name=""/>
+                        </ac:structured-macro>
+                        </td>
+                    {% endfor %}
+
+                {% endif %}
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td><ac:structured-macro ac:name="status" ac:schema-version="1"
+                                                 ac:macro-id="25a4c6d5-3ebb-404e-85c6-17f894c782a9">
+                                <ac:parameter ac:name="colour">{{status_colour}}</ac:parameter>
+                                <ac:parameter ac:name="title">{{status}}</ac:parameter>
+                                <ac:parameter ac:name=""/></ac:structured-macro></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="auto-cursor-target"><br/></p></ac:rich-text-body>
+</ac:structured-macro>

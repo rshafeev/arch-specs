@@ -1,0 +1,9 @@
+aiohttp==3.7.3
+PyYAML==5.3.1
+aiofile==3.5.0
+parso==0.8.0
+jinja2==2.11.2
+jinja2-getenv-extension==0.0.4
+jsonschema==3.2.0
+validators==0.18.2
+markupsafe==2.0.1

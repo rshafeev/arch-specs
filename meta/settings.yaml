@@ -1,0 +1,27 @@
+categories:
+  product:
+    feature:
+    observability:
+    storage:
+
+  external:
+    external:
+
+confluence:
+  link: https://yourcompany.atlassian.net/wiki/display/
+  space: <your space>
+  handbook_page: Services Handbook
+  system_diagram_parent_page: "{handbook} system diagram"
+  modules:
+    storage:
+      label: "storage-service"
+      title: "storage"
+    feature:
+      label: "feature-service"
+      title: "feature"
+    observability:
+      label: "observability-service"
+      title: "observability"
+
+markdown_template_vars:
+  some_var: "some_value"

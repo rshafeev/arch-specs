@@ -1,0 +1,45 @@
+system:
+    column_services_cnt_max: 5
+
+
+service-topics-container:
+    x_shift: 3
+    y_shift: 10
+    w_min: 100
+    x_between: 5
+    y_between: 5
+    bottom_shift: 5
+    x_topic_shift: 3
+    y_topic_shift: 7
+    h_topics_shift: 3
+    bottom_topic_shift: 3
+    label_height: 12
+    label_x_shift: 3
+    label_y_shift: -6
+    hide_topics_for_services:
+        external:
+service-core:
+    width_min: 170
+    height_min: 50
+    label_height: 16
+    status_label_height: 14
+    add_images_by_service_module:
+        external:
+
+service-topic:
+    height: 14
+    x_shift: 2
+    disable_arrow_links_service_name:
+        external:
+
+service-connector:
+    transport_label_x_shift: 5
+    label_height: 12
+    label_width_append: 7
+    y_between: 5
+    x_shift: 5
+    bottom_shift: 2
+    ellipse_size: 10
+
+order:
+    

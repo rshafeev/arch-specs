@@ -1,0 +1,16 @@
+app:
+  max_parallel_tasks_cnt: {{'max_parallel_tasks_cnt'|getenv('17')}}
+
+publish:
+  branch: {{'git_branch'|getenv('master')}}
+  service: {{'publish_service'|getenv('all')}}
+
+git:
+  branch: {{'git_branch'|getenv('develop')}}
+
+fonts:
+  - file: times.ttf
+    family: Times New Roman
+
+logging:
+  level: {{'logging_level'|getenv('INFO')}}

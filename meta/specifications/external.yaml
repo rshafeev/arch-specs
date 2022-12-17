@@ -1,0 +1,17 @@
+# все возможные definitions представлены в файле :schema/definitions.yaml
+# json-схема валидации находится в файле: schema/service.yaml
+definitions:
+  state:
+    stateless: &stateless "stateless"
+    stateful: &stateful "stateful"
+  status:
+    ready: &ready "ready"
+  type:
+    s3: &s3 "s3"
+
+external:
+  s3:
+    name: s3
+    module: external
+    status: *ready
+    type: *s3

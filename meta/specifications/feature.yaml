@@ -1,0 +1,49 @@
+# все возможные definitions представлены в файле :schema/definitions.yaml
+# json-схема валидации находится в файле: schema/service.yaml
+definitions:
+  status:
+    ready: &ready "ready"
+    deprecated: &deprecated "deprecated"
+  state:
+    stateless: &stateless "stateless"
+  teams:
+    dev_team: &dev_team
+      name: DEV Team
+      lead: Roman Shafeev
+  type:
+      grpc_api: &grpc_api  "grpc_api"
+      rest_api: &rest_api "rest_api"
+  data_direction:
+    rx: &rx "rx"
+    tx: &tx "tx"
+    rx_tx: &rx_tx "rx_tx"
+
+feature:
+  api:
+    desc: gRPC API of the product feature.
+    language: python
+    module: feature
+    owner: Roman Shafeev
+    src: https://github.com/rshafeev/busweb-net
+    status: *ready
+    state: *stateless
+    type: *grpc_api
+    connect_to:
+      - name: postgresql
+        desc: store feature entities
+        transport: tcp
+        protocol: pg
+        data_direction: *rx_tx
+      - name: otlp-collector
+        desc: send tracing spans in open-telemetry format
+        protocol: grpc
+        data_direction: *tx
+      - name: s3
+        desc: store feature entities to s3
+        protocol: http
+        data_direction: *tx
+    dev_team:
+      - *dev_team
+    interfaces:
+      grpc:
+        protocol:
