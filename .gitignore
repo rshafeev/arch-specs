@@ -1,0 +1,7 @@
+.idea/
+tmp/
+.git.arch_specs_autogen/
+arch_specs_autogen/
+*.pyc
+*.bkp
+*.env
