@@ -16,7 +16,7 @@ class HtmlComponentTemplateName(Enum):
 
 
 class HtmlPageTemplateName(Enum):
-    component_branch_diagram = auto()
+    diagram = auto()
     system_network_branch_diagram = auto()
     network_basic = auto()
     service = auto()

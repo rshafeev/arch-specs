@@ -2,12 +2,6 @@ from core.git.branch import Branch
 from data.specs.service_spec_ext import ServiceSpecExt
 
 
-class ComponentBranchDiagramPageTitle:
-    @staticmethod
-    def title(branch: Branch):
-        return "[{}] Component Diagram".format(branch.name)
-
-
 class SystemNetworkBranchDiagramPageTitle:
     @staticmethod
     def title(branch: Branch):

@@ -1,7 +1,7 @@
 import logging
 from typing import Set
 
-from content.page.component.publisher import ComponentBranchDiagramPublisher
+from content.page.diagram.publisher import DiagramPublisher
 from content.page.handbook.network.basic.publisher import NetworkBasicPublisher
 from content.page.handbook.network.branch.diagram.publisher import NetworkBranchDiagramPublisher
 from content.page.handbook.network.branch.links.publisher import NetworkBranchLinksPublisher
@@ -41,7 +41,7 @@ class PagesPublisher:
 
     __branch: Branch
 
-    __publish_only_component_diagram: bool
+    __publish_only_diagrams: bool
 
     def __init__(self,
                  html_templates_storage: HtmlTemplatesStorage,
@@ -52,7 +52,7 @@ class PagesPublisher:
                  max_parallel_tasks_cnt: int,
                  branch: Branch,
                  cache_path: str,
-                 publish_only_component_diagram: bool):
+                 publish_only_diagrams: bool):
         self.__html_templates_storage = html_templates_storage
         self.__max_releases_cnt = max_releases_cnt
         self.__confluence = confluence
@@ -61,7 +61,7 @@ class PagesPublisher:
         self.__max_parallel_tasks_cnt = max_parallel_tasks_cnt
         self.__branch = branch
         self.__user_keys_storage = UsersKeysCacheStorage(self.__confluence, cache_path)
-        self.__publish_only_component_diagram = publish_only_component_diagram
+        self.__publish_only_diagrams = publish_only_diagrams
 
     @property
     def branch(self) -> Branch:
@@ -72,9 +72,10 @@ class PagesPublisher:
 
     async def __publish_pages(self):
         tasks_pool = TasksPool(self.__max_parallel_tasks_cnt)
-        if self.__services_specs.settings.confluence.has_component_diagram_page:
-            await tasks_pool.append(self.__publish_component_diagram_pages())
-        if not self.__publish_only_component_diagram:
+        if self.__services_specs.settings.confluence.diagrams:
+            for diagram_settings in self.__services_specs.settings.confluence.diagrams:
+                await tasks_pool.append(self.__publish_diagram_page(diagram_settings))
+        if not self.__publish_only_diagrams:
             await tasks_pool.append(self.__publish_system_diagram_pages())
             await self.__publish_category_pages()
             for service_name in self.__services_specs.all_services:
@@ -118,15 +119,13 @@ class PagesPublisher:
         parent_page = await self.__confluence.pages.find(parent_title, wiki_space)
         await network_page_publisher.publish(parent_page)
 
-    async def __publish_component_diagram_pages(self):
-        component_page_publisher = ComponentBranchDiagramPublisher(self.__confluence,
+    async def __publish_diagram_page(self, diagram_settings: dict):
+        page_publisher = DiagramPublisher(self.__confluence,
                                                                      self.branch,
                                                                      self.__html_templates_storage,
-                                                                     self.__services_specs.settings)
-        wiki_space = self.__services_specs.settings.confluence.space
-        parent_title = self.__services_specs.settings.confluence.parent_component_diagram_page
-        parent_page = await self.__confluence.pages.find(parent_title, wiki_space)
-        await component_page_publisher.publish(parent_page)
+                                                                     self.__services_specs.settings,
+                                                                     diagram_settings)
+        await page_publisher.publish()
 
     async def __publish_service_pages(self, spec: ServiceSpecExt):
         force_recreate_handbook = self.__app_configuration['publish']['force_recreate_handbook']

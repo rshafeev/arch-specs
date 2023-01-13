@@ -35,7 +35,7 @@ class App(AppCore):
         args_parser.add_argument(
             "-s", "--specs_repo_path", dest="specs_repo_path", help="specs_repo_path", required=True)
         args_parser.add_argument('--validate_only', action='store_true')
-        args_parser.add_argument('--publish_only_component', action='store_true')
+        args_parser.add_argument('--publish_only_diagrams', action='store_true')
 
         args_parser.add_argument(
             "--removed_branch", "--removed_branch", dest="removed_branch",
@@ -94,7 +94,7 @@ class App(AppCore):
                                               self.max_parallel_tasks_cnt,
                                               current_branch,
                                               cache_path,
-                                              self.args.publish_only_component)
+                                              self.args.publish_only_diagrams)
             await confluence_pages.publish()
         finally:
             if confluence is not None:

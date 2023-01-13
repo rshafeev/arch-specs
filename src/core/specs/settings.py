@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from core.yaml import read_yaml
 
@@ -12,8 +12,11 @@ class ServiceCategoryNameWrapper:
         self.__product_categories = categories["product"]
         self.__external_categories = categories["external"]
         self.__categories = []
-        self.__categories.extend(self.__product_categories)
-        self.__categories.extend(self.__external_categories)
+        if self.__product_categories is not None:
+            self.__categories.extend(self.__product_categories)
+
+        if self.__external_categories is not None:
+            self.__categories.extend(self.__external_categories)
 
     @property
     def product_services(self) -> List[dict]:
@@ -55,8 +58,10 @@ class ConfluenceSettings:
         return self.__raw["component_diagram_parent_page"]
 
     @property
-    def has_component_diagram_page(self) -> bool:
-        return "component_diagram_parent_page" in self.__raw
+    def diagrams(self) -> Optional[dict]:
+        if "diagrams" not in self.__raw:
+            return None
+        return self.__raw["diagrams"]
 
     def module_label(self, module_name: str) -> str:
         return self.__raw["modules"][module_name]["label"]
@@ -81,6 +86,10 @@ class Settings:
         self.__confluence = ConfluenceSettings(self.__raw["confluence"])
 
     @property
+    def meta_path(self):
+        return self.__meta_path
+
+    @property
     def service_categories(self) -> ServiceCategoryNameWrapper:
         return self.__service_categories_name
 
@@ -93,7 +102,3 @@ class Settings:
         if "markdown_template_vars" not in self.__raw:
             return []
         return self.__raw["markdown_template_vars"]
-
-    @property
-    def component_diagram_fname(self) -> str:
-        return "{}/diagrams/component_diagram.xml".format(self.__meta_path)
