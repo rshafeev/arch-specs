@@ -42,6 +42,12 @@ class ConfluenceSettings:
         return self.__raw["space"]
 
     @property
+    def clean_services(self) -> List[str]:
+        if "clean" in self.__raw and "services" in self.__raw["clean"]:
+            return self.__raw["clean"]["services"]
+        return []
+
+    @property
     def handbook_page_title(self) -> str:
         return self.__raw["handbook_page"]
 

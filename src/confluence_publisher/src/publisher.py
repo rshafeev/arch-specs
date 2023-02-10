@@ -17,6 +17,7 @@ from core.specs.specs import ServicesSpecs
 from core.task.task_pool import TasksPool
 from data.confluence.cache.users_keys_cache_storage import UsersKeysCacheStorage
 from data.confluence.model.page import ConfluencePage
+from data.confluence.model.title import ServiceHandbookPageTitle
 from data.confluence.service import ConfluenceService
 from data.specs.service_spec_ext import ServiceSpecExt
 from data.template.templates_storage import HtmlTemplatesStorage
@@ -68,6 +69,7 @@ class PagesPublisher:
         return self.__branch
 
     async def publish(self):
+        await self.__clean_services()
         await self.__publish_pages()
 
     async def __publish_pages(self):
@@ -118,6 +120,13 @@ class PagesPublisher:
         parent_title = self.__services_specs.settings.confluence.parent_system_diagram_page
         parent_page = await self.__confluence.pages.find(parent_title, wiki_space)
         await network_page_publisher.publish(parent_page)
+
+    async def __clean_services(self):
+        wiki_space = self.__services_specs.settings.confluence.space
+        for service_name in self.__services_specs.settings.confluence.clean_services:
+            page = await self.__confluence.pages.find(service_name, wiki_space)
+            if page:
+                await self.__confluence.pages.delete(page.id)
 
     async def __publish_diagram_page(self, diagram_settings: dict):
         page_publisher = DiagramPublisher(self.__confluence,
