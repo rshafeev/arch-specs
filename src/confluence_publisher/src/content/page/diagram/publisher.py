@@ -78,6 +78,8 @@ class DiagramPublisher:
             logging.info("Component Page '{}' was updated.".format(page.title))
         else:
             await self.__confluence.pages.create(page)
+            await self.__confluence.properties.set(page.id, PropertyKey.content_appearance_draft, "full-width")
+            await self.__confluence.properties.set(page.id, PropertyKey.content_appearance_published, "full-width")
             logging.info("Component Page '{}' was created.".format(page.title))
 
         diagram_confluence_name = "{}_diagram".format(SystemNetworkBranchDiagramView.diagram_name)
@@ -88,6 +90,7 @@ class DiagramPublisher:
         if diagram_attachment is None:
             await self.__confluence.attachments.create(page.id, self.diagram_fname, diagram_confluence_name)
             await self.__confluence.properties.set(page.id, PropertyKey.network_diagram_hash, repo_diagram_hash_commit)
+
             logging.info("Page '{}'. The draw.io component diagram was created.".format(page.title))
         else:
             confluenece_diagram_hash = await self.__confluence.properties.get(page.id, PropertyKey.network_diagram_hash)
