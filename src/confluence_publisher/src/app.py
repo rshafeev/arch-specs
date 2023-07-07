@@ -31,7 +31,7 @@ class App(AppCore):
             "--cache_path", "--cache_path", dest="cache_path", help="cache_path", default="/tmp", required=False,)
         args_parser.add_argument(
             "--html_templates_path", "--html_templates_path", dest="html_templates_path",
-            help="html_templates_path", default=path + "/../res/template", required=False)
+            help="html_templates_path", default=path + "/../res/template-onprem", required=False)
         args_parser.add_argument(
             "-s", "--specs_repo_path", dest="specs_repo_path", help="specs_repo_path", required=True)
         args_parser.add_argument('--validate_only', action='store_true')

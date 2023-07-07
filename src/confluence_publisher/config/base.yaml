@@ -13,6 +13,7 @@ git:
 
 confluence:
   url: {{'confluence_url'|getenv('')}}
+  cloud: 0
   auth_user: {{'confluence_auth_user'|getenv('')}}
   auth_password: {{'confluence_auth_password'|getenv('')}}
   auth_token: {{'confluence_publish_token'|getenv('')}}

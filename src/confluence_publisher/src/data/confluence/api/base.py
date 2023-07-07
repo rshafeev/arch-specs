@@ -57,6 +57,9 @@ class ApiBase:
         return self.__config['url']
 
     @property
+    def is_cloud(self) -> bool:
+        return self.__config['cloud'] == 1
+    @property
     def session(self) -> ClientSessionExt:
         return self.__session.current
 

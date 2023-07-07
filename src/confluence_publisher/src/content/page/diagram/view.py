@@ -17,7 +17,7 @@ class DiagramView:
 
     async def render(self) -> str:
         render_params = {
-            "diagram_name": self.diagram_name,
+            "diagram_name": f"{self.diagram_name}_diagram",
             "current_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
         html_s = await self.__template.render_async(render_params)

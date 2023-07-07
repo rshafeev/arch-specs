@@ -30,7 +30,7 @@ class UsersKeysCacheStorage:
 
     async def get_user_key(self, owner_name: str):
         owner_name_l = owner_name.lower()
-        if owner_name_l not in self.__cache_user_keys:
+        if owner_name_l not in self.__cache_user_keys or self.__cache_user_keys[owner_name_l] is None:
             self.__cache_user_keys[owner_name_l] = await self.__confluence.users.get_key(owner_name_l)
 
         if owner_name_l not in self.__cache_user_keys:

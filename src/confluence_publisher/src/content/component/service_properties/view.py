@@ -11,9 +11,18 @@ class ServicePropertiesView:
     def __init__(self, html_templates_storage: HtmlTemplatesStorage):
         self.__template = html_templates_storage.get_component(HtmlComponentTemplateName.service_properties)
 
+    # @staticmethod
+    # def account_link(user_key, owner_name):
+    #     return "<ac:link><ri:user ri:account-id=\"{}\"/></ac:link>".format(user_key)
+    # todo: for_cloud!
+
     @staticmethod
-    def account_link(user_key):
-        return "<ac:link><ri:user ri:account-id=\"{}\"/></ac:link>".format(user_key)
+    def account_link(user_key, user_name):
+        return "<ac:link><ri:user ri:userkey=\"{}\"/></ac:link>".format(user_key)
+
+    @staticmethod
+    def account_name(user_key, user_name):
+        return f"<strong>{user_name}</strong>"
 
     @staticmethod
     def source_code_link(spec: ServiceSpecExt):
@@ -26,7 +35,17 @@ class ServicePropertiesView:
         owner_keys = await spec.owner_keys()
         content = ''
         for owner_name in owner_keys:
-            content = content + ServicePropertiesView.account_link(spec.raw['owner_keys'][owner_name])
+            if len(content) > 0:
+                content = content + ', '
+            content = content + ServicePropertiesView.account_name(spec.raw['owner_keys'][owner_name], owner_name)
+        return content
+
+    @staticmethod
+    async def form_service_responsible_link_content(spec: ServiceSpecExt):
+        owner_keys = await spec.owner_keys()
+        content = ''
+        for owner_name in owner_keys:
+            content = content + ServicePropertiesView.account_link(spec.raw['owner_keys'][owner_name], owner_name)
         return content
 
     @staticmethod
@@ -57,6 +76,7 @@ class ServicePropertiesView:
             "language": spec.raw['language'] if 'language' in spec.raw else "",
             "has_language": 'language' in spec.raw,
             "status_colour": self.__status_colour(spec),
+            "responsible_link": await self.form_service_responsible_link_content(spec),
             "responsible": await self.form_service_responsible_content(spec),
             "service_module": settings.confluence.module_title(spec.raw['module']),
             "service_type": spec.type,
