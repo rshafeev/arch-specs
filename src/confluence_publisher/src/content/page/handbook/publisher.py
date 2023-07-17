@@ -89,7 +89,7 @@ class HandbookPagePublisher:
                         last_update_hash != current_hash or \
                         force_recreate_handbook == 1 or \
                         force_rewrite_handbook_properties == 1:
-                    page = await self.__prepare_handbook_page(spec, page, force_recreate_handbook)
+                    page = await self.__prepare_handbook_page(spec, page, force_recreate_handbook=1)
                     await self.__confluence.pages.update(page)
                     logging.info("Page '{}' was updated.".format(page.title))
                     await self.__confluence.properties.set(page.id, PropertyKey.spec_hash, current_hash)
