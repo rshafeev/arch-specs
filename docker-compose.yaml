@@ -35,7 +35,7 @@ services:
       - output_path=/arch_specs_autogen
       - cache_path=/arch_specs_autogen
       - logging_level=DEBUG
-      - confluence_url=https://mtsai.atlassian.net/wiki/rest/api
+      - confluence_url=https://confluence.mts.ai/rest/api
       - confluence_auth_user=${confluence_auth_user}
       - confluence_auth_password=${confluence_auth_password}
       - force_recreate_handbook=0
