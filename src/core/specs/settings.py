@@ -34,6 +34,11 @@ class ConfluenceSettings:
         self.__raw = raw
 
     @property
+    def service_prefix(self) -> str:
+        if "service_prefix" not in self.__raw:
+            return ""
+        return self.__raw["service_prefix"]
+    @property
     def link(self) -> str:
         return self.__raw["link"]
 

@@ -108,11 +108,16 @@ class XmlTopicsContainer(XmlObject):
                 label = "Consumer Topics"
             elif self.__connector.dest.is_celery_broker:
                 label = "Consumer Tasks"
+            elif self.__connector.dest.is_mq_broker:
+                label = "Consumer Queues"
+
         else:
             if self.__connector.dest.is_kafka_broker:
                 label = "Producer Topics"
             elif self.__connector.dest.is_celery_broker:
                 label = "Producer Tasks"
+            elif self.__connector.dest.is_mq_broker:
+                label = "Producer Queues"
         if self.__connector.channel_type == ChannelType.other:
             label = label + " ({})".format(self.__connector.dest.service_name)
         label_w, label_h = TextPixelSize.text_dim(self.config, label, self.__label_style)

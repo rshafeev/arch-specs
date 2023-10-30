@@ -13,10 +13,8 @@ class ApiUser(ApiBase):
         payload = {'cql': "{{user.fullname~\"{}\"}}".format(username)}
         headers = {'Content-Type': 'application/json'}
         url = "{}/search".format(self.url)
-        print(url)
         response = await self.session.get(url, params=payload, headers=headers)
         response_body = await self.session.response_body(response)
-        print(response_body)
         if response_body is None or 'results' not in response_body or len(response_body["results"]) == 0:
             return None
         for e in response_body["results"]:

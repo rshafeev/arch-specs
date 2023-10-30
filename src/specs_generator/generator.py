@@ -162,11 +162,46 @@ class SpecsGenerator:
                     rows.append(row)
         return rows
 
+    def build_service_queues_table(self, service: ServiceSpec, direction: str):
+        if service is None or service.has_connectors is False:
+            return []
+        rows = []
+
+        for connector in service.connectors:
+            if connector.data_direction == direction:
+                broker = connector.dest
+                broker_link = self.service_link(broker.service_name)
+                if connector.channel_type != ChannelType.queue:
+                    continue
+                for channel_name in connector.channels:
+                    channel = connector.channels[channel_name]
+                    queue_info = broker.queue(channel_name)
+                    row = {
+                        "Broker": self.html_link(broker_link, broker.service_name),
+                        "Queue": channel_name,
+                    }
+                    if channel is not None and "desc" in channel and channel['desc'] is not None and len(
+                            channel['desc']) > 0:
+                        row["Description"] = self.markdown2html(channel["desc"])
+                    elif queue_info is  not None and "desc" in queue_info:
+                        row["Description"] = self.markdown2html(queue_info["desc"])
+                    self.__producers_row(connector.dest, channel_name, row)
+                    self.__consumers_row(connector.dest, channel_name, row)
+                    if 'Producers' not in row:
+                        row['Producers'] = "-"
+                    if 'Consumers' not in row:
+                        row['Consumers'] = "-"
+                    rows.append(row)
+        return rows
+
     def __producers_row(self, service: ServiceSpec, channel_name, output_row):
         if service.is_kafka_broker:
             channel = service.topics[channel_name]
         if service.is_celery_broker:
             channel = service.celery_tasks[channel_name]
+        if service.is_mq_broker:
+            channel = service.queues[channel_name]
+
         if channel is not None and 'tx' in channel:
             for service_name in channel['tx']:
                 service_spec = self.services_specs.get_service_spec(service_name)
@@ -186,6 +221,8 @@ class SpecsGenerator:
             channel = service.topics[channel_name]
         if service.is_celery_broker:
             channel = service.celery_tasks[channel_name]
+        if service.is_mq_broker:
+            channel = service.queues[channel_name]
         if channel is not None and 'rx' in channel:
             for service_name in channel['rx']:
                 service_spec = self.services_specs.get_service_spec(service_name)
@@ -222,6 +259,37 @@ class SpecsGenerator:
                     "protocol" in topic and \
                     topic["protocol"] is not None:
                 row["Protocol"] = self.markdown2html(topic["protocol"])
+
+            if 'Producers' not in row:
+                row['Producers'] = "-"
+            if 'Consumers' not in row:
+                row['Consumers'] = "-"
+            rows.append(row)
+        return rows
+
+    def build_queues_usage_table(self, service: ServiceSpec):
+        rows = []
+        for queue_name in service.queues:
+            queue = service.queues[queue_name]
+
+            row = {
+                'Queue': queue_name,
+            }
+            self.__producers_row(service, queue_name, row)
+            self.__consumers_row(service, queue_name, row)
+
+            if 'Producers' not in row and 'Consumers' not in row:
+                continue
+
+            if queue is not None and \
+                    "desc" in queue and \
+                    queue['desc'] is not None and \
+                    len(queue['desc']) > 0:
+                row["Description"] = self.markdown2html(queue["desc"])
+            if queue is not None and \
+                    "protocol" in queue and \
+                    queue["protocol"] is not None:
+                row["Protocol"] = self.markdown2html(queue["protocol"])
 
             if 'Producers' not in row:
                 row['Producers'] = "-"
@@ -366,6 +434,9 @@ class SpecsGenerator:
                 if service_specs.topics is not None:
                     topics_usage_table = self.build_topics_usage_table(service_specs)
                     self.store_as_json_file(topics_usage_table, service_dir + "/topics.json")
+                if service_specs.queues is not None:
+                    queues_usage_table = self.build_queues_usage_table(service_specs)
+                    self.store_as_json_file(queues_usage_table, service_dir + "/queues.json")
             else:
                 rx_topics_table = self.build_service_topics_table(service_specs, "rx")
                 self.store_as_json_file(rx_topics_table, service_dir + "/rx_topics.json")
@@ -375,3 +446,7 @@ class SpecsGenerator:
                 self.store_as_json_file(rx_tasks_table, service_dir + "/rx_celery_tasks.json")
                 tx_tasks_table = self.build_service_tasks_table(service_specs, "tx")
                 self.store_as_json_file(tx_tasks_table, service_dir + "/tx_celery_tasks.json")
+                rx_queues_table = self.build_service_queues_table(service_specs, "rx")
+                self.store_as_json_file(rx_queues_table, service_dir + "/rx_queues.json")
+                tx_queues_table = self.build_service_queues_table(service_specs, "tx")
+                self.store_as_json_file(tx_queues_table, service_dir + "/tx_queues.json")

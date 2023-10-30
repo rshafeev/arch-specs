@@ -8,6 +8,7 @@ from core.specs.settings import Settings
 
 class ServiceType(Enum):
     kafka = "kafka"
+    activemq = "activemq"
     unknown = ""
 
 
@@ -47,7 +48,7 @@ class ServiceSpec:
 
     @property
     def wiki_name(self) -> str:
-        return "{}".format(self.service_name)
+        return f"{self.settings.confluence.service_prefix}{self.service_name}"
 
     @property
     def is_pro(self) -> bool:
@@ -86,12 +87,20 @@ class ServiceSpec:
     @property
     def is_kafka_broker(self) -> bool:
         return self.type in [ServiceType.kafka.value]
+
+    @property
+    def is_mq_broker(self) -> bool:
+        return self.type in [ServiceType.activemq.value]
+
     @property
     def is_celery_broker(self) -> bool:
         return 'used_as_celery' in self.__raw_spec and self.__raw_spec['used_as_celery'] is True
+
     @property
     def is_broker(self) -> bool:
-        return self.is_kafka_broker is True or self.is_celery_broker is True
+        return (self.is_kafka_broker is True or
+                self.is_celery_broker is True  or
+                self.is_mq_broker is True)
 
     @property
     def settings(self) -> Settings:
@@ -166,6 +175,16 @@ class ServiceSpec:
             return raw['celery_tasks'][task_name]
         return None
 
+    def queue(self, queue_name) -> Optional[dict]:
+        if self.is_broker is False:
+            return None
+        raw = self.__raw_spec
+        if 'queues' not in raw:
+            return None
+        if queue_name in raw['queues']:
+            return raw['queues'][queue_name]
+        return None
+
     @property
     def topics(self) -> Optional[dict]:
         if self.is_broker is False:
@@ -174,6 +193,15 @@ class ServiceSpec:
         if 'topics' not in raw:
             return None
         return raw['topics']
+
+    @property
+    def queues(self) -> Optional[dict]:
+        if self.is_broker is False:
+            return None
+        raw = self.__raw_spec
+        if 'queues' not in raw:
+            return None
+        return raw['queues']
 
     @property
     def celery_tasks(self) -> Optional[dict]:

@@ -10,8 +10,6 @@ class ChannelType(Enum):
     other = "other"
 
 
-
-
 class ServiceSpecConnector:
     __connect_to: Optional[dict]
     source: 'ServiceSpec'
@@ -40,19 +38,25 @@ class ServiceSpecConnector:
             return
         if self.dest.is_kafka_broker:
             self.__connect_to['transport'] = 'tcp'
+        if self.dest.is_mq_broker:
+            self.__connect_to['transport'] = 'tcp'
         if 'protocol' in self.__connect_to and (
                 self.__connect_to['protocol'] in ("ws", "wss", "http", "https", "grpc") or self.__connect_to[
             'protocol'].find("grpc") >= 0):
             self.__connect_to['transport'] = 'tcp'
 
     def __set_channel_type(self):
-        if "celery_tasks" not in self.__connect_to and "topics" not in self.__connect_to:
+        if ("celery_tasks" not in self.__connect_to and
+            "topics" not in self.__connect_to and
+            "queues" not in self.__connect_to):
             self.__channel_type = ChannelType.other
             return
         if "topics" in self.__connect_to:
             self.__channel_type = ChannelType.topic
         elif "celery_tasks" in self.__connect_to:
             self.__channel_type = ChannelType.celery_task
+        elif "queues" in self.__connect_to:
+            self.__channel_type = ChannelType.queue
         else:
             self.__channel_type = ChannelType.other
 
@@ -115,7 +119,7 @@ class ServiceSpecConnector:
             self.dest.raw['used_as_celery'] = True
         if not self.dest.is_broker:
             return
-        if self.channel_type not in [ChannelType.celery_task, ChannelType.topic]:
+        if self.channel_type not in [ChannelType.celery_task, ChannelType.topic, ChannelType.queue]:
             return
         key = self.__many(self.__channel_type)
         source_spec = self.dest.raw

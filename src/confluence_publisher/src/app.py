@@ -67,7 +67,6 @@ class App(AppCore):
             validator = OwnersValidator(services_specs, confluence, cache_path)
             valid, errors = await validator.validate()
             if valid is False:
-                validator.print(errors)
                 logging.error("Owner`s names Validation - FAILED")
                 return 1
             if self.args.validate_only:

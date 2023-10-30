@@ -47,7 +47,6 @@ class ApiProperty(ApiBase):
 
     async def version(self, page_id: str, key: PropertyKey) -> Optional[int]:
         response_body = await self._get(page_id, key, "content,version")
-        print(response_body)
         if response_body is not None and 'version' in response_body:
             return response_body['version']['number']
         return None
