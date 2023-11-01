@@ -30,7 +30,7 @@ class HandbookPagePublisher:
 
     async def __prepare_handbook_page(self, spec: ServiceSpecExt, page: Optional[ConfluencePage],
                                       force_recreate_handbook: int) -> ConfluencePage:
-        parent_page_title = "{{handbook}} {}".format(spec.category)
+        parent_page_title = f"{spec.settings.confluence.module_prefix}{spec.category}"
         settings = spec.settings
         service_module_label = settings.confluence.module_label(spec.service_module)
         parent_page = await self.__confluence.pages.find(parent_page_title, spec.settings.confluence.space)

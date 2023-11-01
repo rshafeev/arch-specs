@@ -99,7 +99,7 @@ class PagesPublisher:
             raise Exception("Could not find Handbook Services Page")
 
         for category_name in settings.service_categories.product_services:
-            category_page_title = "{{handbook}} {}".format(category_name)
+            category_page_title = f"{settings.confluence.module_prefix}{category_name}"
             page = await self.__confluence.pages.find(category_page_title,
                                                       settings.confluence.space)
             if page is not None:
@@ -117,18 +117,10 @@ class PagesPublisher:
                                                                      self.__html_templates_storage,
                                                                      self.__services_specs.settings)
         wiki_space = self.__services_specs.settings.confluence.space
-        parent_title = self.__services_specs.settings.confluence.parent_system_diagram_page
-        parent_page = await self.__confluence.pages.find(parent_title, wiki_space)
-        if parent_page is None:
-            handbook_page_title = self.__services_specs.settings.confluence.handbook_page_title
-            handbook_page = await self.__confluence.pages.find(handbook_page_title, wiki_space)
-            parent_page = ConfluencePage()
-            parent_page.space_key = wiki_space
-            parent_page.parent_id = handbook_page.id
-            parent_page.title = parent_title
-            parent_page.body = " "
-            await self.__confluence.pages.create(parent_page)
-        await network_page_publisher.publish(parent_page)
+        handbook_page_title = self.__services_specs.settings.confluence.handbook_page_title
+        handbook_page = await self.__confluence.pages.find(handbook_page_title, wiki_space)
+        title = self.__services_specs.settings.confluence.system_diagram_page_title
+        await network_page_publisher.publish(handbook_page, title)
 
     async def __clean_services(self):
         wiki_space = self.__services_specs.settings.confluence.space

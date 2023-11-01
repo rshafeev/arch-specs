@@ -38,6 +38,13 @@ class ConfluenceSettings:
         if "service_prefix" not in self.__raw:
             return ""
         return self.__raw["service_prefix"]
+
+    @property
+    def module_prefix(self) -> str:
+        if "module_prefix" not in self.__raw:
+            return "{handbook} "
+        return self.__raw["module_prefix"]
+
     @property
     def link(self) -> str:
         return self.__raw["link"]
@@ -61,8 +68,8 @@ class ConfluenceSettings:
         return self.__raw["handbook_page"]
 
     @property
-    def parent_system_diagram_page(self) -> str:
-        return self.__raw["system_diagram_parent_page"]
+    def system_diagram_page_title(self) -> str:
+        return self.__raw["system_diagram_page_title"]
 
     @property
     def parent_component_diagram_page(self) -> str:

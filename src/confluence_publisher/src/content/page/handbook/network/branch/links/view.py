@@ -24,8 +24,8 @@ class NetworkBranchLinksView:
         return self.__html_templates_storage.get_page(template_name)
 
     async def render(self, spec: ServiceSpecExt, branch: Branch) -> str:
-        netowrk_json_name = GitSpecsRepositoryHelper.network_fname(spec.service_name)
-        with open(netowrk_json_name) as f:
+        network_json_name = GitSpecsRepositoryHelper.network_fname(spec.service_name)
+        with open(network_json_name) as f:
             network_table = json.loads(f.read())
         topics_table = []
         if spec.is_kafka_broker:

@@ -11,13 +11,13 @@ class SystemNetworkBranchDiagramPageTitle:
 class ServiceHandbookPageTitle:
     @staticmethod
     def title(spec: ServiceSpecExt):
-        return "{}".format(spec.service_name)
+        return f"{spec.settings.confluence.service_prefix}{spec.service_name}"
 
 
 class ServiceHandbookManualPageTitle:
     @staticmethod
     def title(spec: ServiceSpecExt):
-        return "{}: handbook".format(spec.service_name)
+        return "{}: additional description".format(spec.service_name)
 
 
 class NetworkBasicPageTitle:

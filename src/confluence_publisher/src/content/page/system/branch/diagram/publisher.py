@@ -33,10 +33,6 @@ class SystemNetworkBranchDiagramPublisher:
         self.__specs_settings = specs_settings
         self.__page_view = SystemNetworkBranchDiagramView(html_templates_storage)
 
-    @staticmethod
-    def title(branch: Branch):
-        return SystemNetworkBranchDiagramPageTitle.title(branch)
-
     async def __prepare_page(self,
                              page: ConfluencePage,
                              network_branch_page: ConfluencePage,
@@ -47,17 +43,16 @@ class SystemNetworkBranchDiagramPublisher:
         page.body = await self.__page_view.render(current_branch)
         return page
 
-    async def publish(self, system_network_page: ConfluencePage) -> ConfluencePage:
-        page = await self.__confluence.pages.find(self.title(self.__branch), self.__specs_settings.confluence.space)
+    async def publish(self, parent_page: ConfluencePage, title: str) -> ConfluencePage:
+        page = await self.__confluence.pages.find(title, self.__specs_settings.confluence.space)
         if page is None and not self.__branch.is_master and not self.__branch.is_release:
-            raise Exception('''You try to create '{}' page from the non-master/non-release branch '{}'!
-                Please, create handbook page from the master or release branch!'''.format(
-                self.title(self.__branch), self.__branch.name))
+            raise Exception(f'''You try to create '{title}' page from the non-master/non-release branch '{self.__branch.name}'!
+                Please, create handbook page from the master or release branch!''')
 
         if page is None:
             page = ConfluencePage()
-            page.title = self.title(self.__branch)
-        page = await self.__prepare_page(page, system_network_page, self.__branch)
+            page.title = title
+        page = await self.__prepare_page(page, parent_page, self.__branch)
         if page.id:
             await self.__confluence.pages.update(page)
             logging.info("Page '{}' was updated.".format(page.title))
