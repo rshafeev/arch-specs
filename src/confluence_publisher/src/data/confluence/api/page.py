@@ -33,7 +33,6 @@ class ApiPage(ApiBase):
         response_body = await self.session.response_body(response)
         page.id = response_body['id']
         await self.add_labels_to_page(page.id, page.labels)
-
         return response_body
 
     @transaction()

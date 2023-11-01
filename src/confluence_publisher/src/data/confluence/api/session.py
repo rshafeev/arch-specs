@@ -83,7 +83,7 @@ class ClientSessionExt(aiohttp.ClientSession):
         except Exception as e:
             if "json" in kwargs and kwargs["json"] is not None:
                 json_s = json.dumps(kwargs["json"], ensure_ascii=False).encode('utf8')
-                logging.info('[%s] body: %s', request_id, json_s)
+                logging.error('[%s] body: %s', request_id, json_s)
             raise e
 
     @staticmethod

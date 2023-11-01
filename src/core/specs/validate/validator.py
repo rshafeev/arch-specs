@@ -1,13 +1,14 @@
 import json
 from enum import Enum, auto
 
-from jsonschema import Draft3Validator
+from jsonschema import Draft202012Validator
 
 from core.specs.settings import Settings, ServiceCategoryNameWrapper
 
 
 class SchemaType(Enum):
     service = auto()
+    third_party = auto()
 
 
 class Validator:
@@ -23,9 +24,9 @@ class Validator:
         with open(file_name) as f:
             return json.load(f)
 
-    def validator(self, schema_type: SchemaType) -> Draft3Validator:
+    def validator(self, schema_type: SchemaType) -> Draft202012Validator:
         source_schema = self.source_schema(schema_type)
-        return Draft3Validator(source_schema)
+        return Draft202012Validator(source_schema)
 
     @property
     def service_categories(self) -> ServiceCategoryNameWrapper:

@@ -41,7 +41,7 @@ class ServiceSpecConnector:
         if self.dest.is_mq_broker:
             self.__connect_to['transport'] = 'tcp'
         if 'protocol' in self.__connect_to and (
-                self.__connect_to['protocol'] in ("ws", "wss", "http", "https", "grpc") or self.__connect_to[
+                self.__connect_to['protocol'] in ("ws", "wss", "http", "https", "grpc", "s3") or self.__connect_to[
             'protocol'].find("grpc") >= 0):
             self.__connect_to['transport'] = 'tcp'
 

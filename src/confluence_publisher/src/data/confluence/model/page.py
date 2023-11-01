@@ -21,17 +21,6 @@ class ConfluencePage:
             }
         else:
             self.__row_content = row_content
-        #
-        # if 'meta' not in self.__row_content:
-        #     self.__row_content['meta'] = {}
-        # if 'properties' not in self.__row_content:
-        #     self.__row_content['meta']['properties'] = {}
-        # self.__row_content['meta']['properties']['content-appearance-draft'] = {
-        #     'value': 'full-width'
-        # }
-        # self.__row_content['meta']['properties']['content-appearance-published'] = {
-        #     'value': 'full-width'
-        # }
 
     @property
     def row_content(self) -> dict:

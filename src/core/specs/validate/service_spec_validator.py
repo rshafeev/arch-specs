@@ -1,7 +1,10 @@
+import json
+import logging
 from typing import Tuple, Dict, List, Optional
 
 import validators
-from jsonschema import Draft3Validator
+from jsonschema import Draft202012Validator
+from jsonschema.validators import Draft7Validator
 
 from core.specs.validate.validator import Validator, SchemaType
 
@@ -9,12 +12,13 @@ from core.specs.validate.validator import Validator, SchemaType
 class ServiceSpecValidator(Validator):
     __specs: dict
 
-    __schema_validator: Draft3Validator
+    __schema_validator: Draft202012Validator
 
     def __init__(self, meta_path: str, specs: dict):
         super().__init__(meta_path)
         self.__specs = specs
         self.__schema_validator = self.validator(SchemaType.service)
+        self.__third_party_schema_validator = self.validator(SchemaType.third_party)
 
     def validate(self, service_key: str, service_spec: dict) -> Tuple[bool, List[Dict[str, str]], List[Dict[str, str]]]:
         errors = []
@@ -25,8 +29,12 @@ class ServiceSpecValidator(Validator):
                 'error': "Empty dict."
             })
             return len(errors) == 0, errors, warns
-
-        for error in sorted(self.__schema_validator.iter_errors(service_spec), key=str):
+        if 'third_party' in service_spec:
+            schema_validator = self.__third_party_schema_validator
+        else:
+            schema_validator = self.__schema_validator
+        validator_errors = sorted(schema_validator.iter_errors(service_spec), key=lambda e: e.path)
+        for error in validator_errors:
             errors.append({
                 'service': service_key,
                 'error': error.message

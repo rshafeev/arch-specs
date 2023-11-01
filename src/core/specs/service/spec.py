@@ -1,3 +1,4 @@
+import logging
 from ctypes import Array
 from enum import Enum, auto
 from typing import Optional, List
@@ -74,6 +75,8 @@ class ServiceSpec:
 
     @property
     def service_module(self) -> str:
+        if 'module' not in self.__raw_spec:
+            print('error')
         return self.__raw_spec['module']
 
     @property

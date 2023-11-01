@@ -119,6 +119,15 @@ class PagesPublisher:
         wiki_space = self.__services_specs.settings.confluence.space
         parent_title = self.__services_specs.settings.confluence.parent_system_diagram_page
         parent_page = await self.__confluence.pages.find(parent_title, wiki_space)
+        if parent_page is None:
+            handbook_page_title = self.__services_specs.settings.confluence.handbook_page_title
+            handbook_page = await self.__confluence.pages.find(handbook_page_title, wiki_space)
+            parent_page = ConfluencePage()
+            parent_page.space_key = wiki_space
+            parent_page.parent_id = handbook_page.id
+            parent_page.title = parent_title
+            parent_page.body = " "
+            await self.__confluence.pages.create(parent_page)
         await network_page_publisher.publish(parent_page)
 
     async def __clean_services(self):
