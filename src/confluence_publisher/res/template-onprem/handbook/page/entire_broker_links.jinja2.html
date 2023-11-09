@@ -1,0 +1,80 @@
+{% if has_topics %}
+ <h3>Topics</h3>
+<table data-layout="default" ac:local-id="0d3073cb-69a9-4226-b32d-e3a6f7200ef4">
+    <colgroup>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+    </colgroup>
+    <tbody>
+    <tr>
+        <th><p><strong>Topic</strong></p></th>
+        <th><p><strong>Description</strong></p></th>
+        <th><p><strong>Protocol</strong></p></th>
+        <th><p><strong>Producers</strong></p></th>
+        <th><p><strong>Consumers</strong></p></th>
+    </tr>
+    {% for row in topics_rows %}
+        <tr>
+          <td><p>{{row['Topic']}}</p></td>
+          <td><p>{{row['Description']}}</p></td>
+          <td><p>{{row['Protocol']}}</p></td>
+          <td><p>{{row['Producers']}}</p></td>
+          <td><p>{{row['Consumers']}}</p></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+{% endif %}
+
+{% if has_celery_tasks %}
+ <h3>Celery Tasks</h3>
+<table data-layout="default" ac:local-id="0d3073cb-69a9-4226-b32d-e3a6f7200ef4">
+    <colgroup>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+    </colgroup>
+    <tbody>
+    <tr>
+        <th><p><strong>Task</strong></p></th>
+        <th><p><strong>Producers</strong></p></th>
+        <th><p><strong>Consumers</strong></p></th>
+    </tr>
+    {% for row in celery_tasks_rows %}
+        <tr>
+          <td><p>{{row['Task']}}</p></td>
+          <td><p>{{row['Producers']}}</p></td>
+          <td><p>{{row['Consumers']}}</p></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+{% endif %}
+
+<h3>Inbound/Outbound Connections</h3>
+<table data-layout="default" ac:local-id="0d3073cb-69a9-4226-b32d-e3a6f7200ef4">
+    <colgroup>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+    </colgroup>
+    <tbody>
+    <tr>
+        <th><p><strong>ServiceName</strong></p></th>
+        <th><p><strong>ConnectDirection</strong></p></th>
+        <th><p><strong>Protocol</strong></p></th>
+        <th><p><strong>Description</strong></p></th>
+    </tr>
+    {% for row in table_rows %}
+        <tr>
+          <td><p>{{row['ServiceName']}}</p></td>
+          <td><p>{{row['ConnectDirection']}}</p></td>
+          <td><p>{{row['Protocol']}}</p></td>
+          <td><p>{{row['Description']}}</p></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

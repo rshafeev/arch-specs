@@ -17,7 +17,12 @@ class ServiceHandbookPageTitle:
 class ServiceHandbookManualPageTitle:
     @staticmethod
     def title(spec: ServiceSpecExt):
-        return "{}: additional description".format(spec.service_name)
+        return f"{spec.service_name}: {spec.settings.confluence.manual_page_title}"
+
+class ServiceHandbookOldManualPageTitle:
+    @staticmethod
+    def title(spec: ServiceSpecExt):
+        return f"{spec.service_name}: {spec.settings.confluence.clear_manual_page_title}"
 
 
 class NetworkBasicPageTitle:

@@ -2,6 +2,7 @@ import logging
 from typing import Set
 
 from content.page.diagram.publisher import DiagramPublisher
+from content.page.entire_handbook.publisher import EntireHandbookPagePublisher
 from content.page.handbook.network.basic.publisher import NetworkBasicPublisher
 from content.page.handbook.network.branch.diagram.publisher import NetworkBranchDiagramPublisher
 from content.page.handbook.network.branch.links.publisher import NetworkBranchLinksPublisher
@@ -74,6 +75,7 @@ class PagesPublisher:
 
     async def __publish_pages(self):
         tasks_pool = TasksPool(self.__max_parallel_tasks_cnt)
+        is_entire_handbook_page = self.__services_specs.settings.confluence.is_entire_handbook_page
         if self.__services_specs.settings.confluence.diagrams:
             for diagram_settings in self.__services_specs.settings.confluence.diagrams:
                 await tasks_pool.append(self.__publish_diagram_page(diagram_settings))
@@ -88,7 +90,10 @@ class PagesPublisher:
                 if self.__app_configuration["publish"]["service"] != 'all' and \
                         self.__app_configuration["publish"]["service"] != service_spec.service_name:
                     continue
-                await tasks_pool.append(self.__publish_service_pages(service_spec))
+                if is_entire_handbook_page:
+                    await tasks_pool.append(self.__publish_service_entire_page(service_spec))
+                else:
+                    await tasks_pool.append(self.__publish_service_pages(service_spec))
         await tasks_pool.done()
 
     async def __publish_category_pages(self):
@@ -131,11 +136,23 @@ class PagesPublisher:
 
     async def __publish_diagram_page(self, diagram_settings: dict):
         page_publisher = DiagramPublisher(self.__confluence,
-                                                                     self.branch,
-                                                                     self.__html_templates_storage,
-                                                                     self.__services_specs.settings,
-                                                                     diagram_settings)
+                                          self.branch,
+                                          self.__html_templates_storage,
+                                          self.__services_specs.settings,
+                                          diagram_settings)
         await page_publisher.publish()
+
+    async def __publish_service_entire_page(self, spec: ServiceSpecExt):
+        force_recreate_handbook = self.__app_configuration['publish']['force_recreate_handbook']
+        force_rewrite_handbook_properties = self.__app_configuration['publish']['force_rewrite_handbook_properties']
+        force_recreate_network_pages = self.__app_configuration['publish']['force_recreate_network_pages']
+        handbook_page_publisher = EntireHandbookPagePublisher(self.__confluence,
+                                                              self.branch,
+                                                              self.__html_templates_storage)
+        handbook_page = await handbook_page_publisher.publish(spec,
+                                                              force_recreate_handbook,
+                                                              force_rewrite_handbook_properties)
+        logging.info("[{}]: done".format(spec.service_name))
 
     async def __publish_service_pages(self, spec: ServiceSpecExt):
         force_recreate_handbook = self.__app_configuration['publish']['force_recreate_handbook']

@@ -16,6 +16,8 @@ class HtmlComponentTemplateName(Enum):
 
 
 class HtmlPageTemplateName(Enum):
+    entire_broker_links = auto()
+    entire_links = auto()
     diagram = auto()
     system_network_branch_diagram = auto()
     network_basic = auto()
@@ -30,6 +32,10 @@ class HtmlPageTemplateName(Enum):
     network_current_kafka = auto()
     network_current_diagram = auto()
     network_current_links = auto()
+    entire_service = auto()
+    entire_service_kafka = auto()
+    entire_diagram = auto()
+
 
     @property
     def dir(self):

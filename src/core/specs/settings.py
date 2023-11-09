@@ -40,10 +40,28 @@ class ConfluenceSettings:
         return self.__raw["service_prefix"]
 
     @property
+    def manual_page_title(self) -> str:
+        if "manual_page_title" not in self.__raw:
+            return "handbook"
+        return self.__raw["manual_page_title"]
+
+    @property
+    def clear_manual_page_title(self) -> Optional[str]:
+        if "clear_manual_page_title" not in self.__raw:
+            return None
+        return self.__raw["clear_manual_page_title"]
+
+    @property
     def module_prefix(self) -> str:
         if "module_prefix" not in self.__raw:
             return "{handbook} "
         return self.__raw["module_prefix"]
+
+    @property
+    def is_entire_handbook_page(self) -> bool:
+        if "is_entire_handbook_page" not in self.__raw:
+            return False
+        return self.__raw["is_entire_handbook_page"]
 
     @property
     def link(self) -> str:
