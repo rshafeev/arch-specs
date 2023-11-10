@@ -32,6 +32,7 @@ class App(AppCore):
 
     def __init__(self):
         super().__init__(self.prepare_args_parser())
+        GitSpecsRepositoryHelper.repo_path = self.args.specs_repo_path
 
     async def run(self) -> int:
         if self.args.validate:

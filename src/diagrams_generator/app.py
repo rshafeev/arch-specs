@@ -39,6 +39,7 @@ class App(AppCore):
     def __init__(self):
         super().__init__(self.prepare_args_parser())
         cssutils.log.setLevel(logging.FATAL)
+        GitSpecsRepositoryHelper.repo_path = self.args.specs_repo_path
 
     @property
     def max_parallel_tasks_cnt(self):
