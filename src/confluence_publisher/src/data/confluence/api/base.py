@@ -57,6 +57,10 @@ class ApiBase:
         return self.__config['url']
 
     @property
+    def download_url(self) -> str:
+        return self.__config['download_url']
+
+    @property
     def is_cloud(self) -> bool:
         return self.__config['cloud'] == 1
     @property

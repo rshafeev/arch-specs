@@ -64,6 +64,17 @@ class ApiPage(ApiBase):
         response_body = await self.session.response_body(response)
         return response_body
 
+    async def get_page(self, page_id: str, expand="body.storage") -> Optional[ConfluencePage]:
+        payload = {'expand': f"space,version,metadata,{expand}"}
+        headers = {'Content-Type': 'application/json'}
+        url = "{}/content/{}".format(self.url, page_id)
+        response = await self.session.get(url, params=payload, headers=headers)
+        response_body = await self.session.response_body(response)
+        if response_body is None:
+            return None
+        page = ConfluencePage(response_body)
+        return page
+
     async def add_labels_to_page(self, page_id: str, labels: List['str']) -> dict:
         if len(labels) == 0:
             return {}
@@ -81,8 +92,8 @@ class ApiPage(ApiBase):
         response_body = await self.session.response_body(response)
         return response_body['version']['number']
 
-    async def childs(self, page_id: str) -> List[ConfluencePage]:
-        payload = {'expand': "page"}
+    async def childs(self, page_id: str, start=0, limit=500) -> List[ConfluencePage]:
+        payload = {'expand': "page", 'start': start, 'limit': limit}
         headers = {'Content-Type': 'application/json'}
         url = "{}/content/{}/child".format(self.url, page_id)
         response = await self.session.get(url, params=payload, headers=headers)

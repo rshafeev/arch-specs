@@ -86,6 +86,11 @@ class ConfluencePage:
             return None
         return self.__row_content['body']['storage']['value']
 
+    @property
+    def body_view(self) -> Optional[str]:
+        if 'body' not in self.__row_content:
+            return None
+        return self.__row_content['body']['view']['value']
     @body.setter
     def body(self, value: str):
         self.__row_content['body'] = {

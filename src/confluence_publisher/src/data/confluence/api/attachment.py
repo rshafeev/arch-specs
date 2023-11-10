@@ -8,8 +8,11 @@ from data.confluence.api.session import SessionWrapper
 
 class ApiAttachment(ApiBase):
 
-    def __init__(self, config: dict, session: SessionWrapper):
-        super().__init__(config, session)
+    _row_session: SessionWrapper
+
+    def __init__(self, config: dict, json_session: SessionWrapper, row_session: SessionWrapper):
+        super().__init__(config, json_session)
+        self._row_session = row_session
 
     async def create(self, page_id: str, local_file_name: str, confluence_file_name: str) -> dict:
         files = FormData()
@@ -40,3 +43,19 @@ class ApiAttachment(ApiBase):
         if 'results' not in response_body or len(response_body['results']) == 0:
             return None
         return response_body['results'][0]
+
+    async def get_all(self, page_id: str, start=0, limit=200) -> Optional[dict]:
+        url = f"{self.url}/content/{page_id}/child/attachment?start={start}&limit={limit}"
+        headers = {'X-Atlassian-Token': 'nocheck'}
+        response = await self.session.get(url,  headers=headers)
+        response_body = await self.session.response_body(response)
+        if 'results' not in response_body or len(response_body['results']) == 0:
+            return None
+        return response_body['results']
+
+    async def download(self, paget_id: str, attachment_title: str) -> bytes:
+        url = f"{self.download_url}/attachments/{paget_id}/{attachment_title}?download=true"
+        headers = {'X-Atlassian-Token': 'nocheck'}
+        response = await self._row_session.current.get(url,  headers=headers)
+        payload = await response.read()
+        return payload

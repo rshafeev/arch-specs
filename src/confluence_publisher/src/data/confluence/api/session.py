@@ -17,6 +17,8 @@ class ClientSessionExt(aiohttp.ClientSession):
 
     __retries_delay_secs: int
 
+    __check_response_code: bool
+
     @property
     def timeout_secs(self) -> int:
         return self.__timeout_secs
@@ -37,6 +39,14 @@ class ClientSessionExt(aiohttp.ClientSession):
     def timeout_secs(self, value: int):
         self.__timeout_secs = value
 
+    @property
+    def check_response_code(self) -> bool:
+        return self.__check_response_code
+    
+    @check_response_code.setter
+    def check_response_code(self, value: bool):
+        self.__check_response_code = value
+    
     @retries_max.setter
     def retries_max(self, value: int):
         self.__retries_max = value
@@ -68,12 +78,13 @@ class ClientSessionExt(aiohttp.ClientSession):
                 try:
                     response = await super()._request(method, url, timeout=self.timeout_secs, **kwargs)
                     response._request_id = request_id
-                    body = await self.response_body(response, False)
-                    if response.status in self.retries_codes or \
-                            (body is not None and 'statusCode' in body and
-                             body['statusCode'] in self.retries_codes):
-                        await asyncio.sleep(self.retries_delay_secs)
-                        continue
+                    if self.check_response_code is True:
+                        body = await self.response_body(response, False)
+                        if response.status in self.retries_codes or \
+                                (body is not None and 'statusCode' in body and
+                                 body['statusCode'] in self.retries_codes):
+                            await asyncio.sleep(self.retries_delay_secs)
+                            continue
                     return response
                 except Exception as e:
                     logging.exception(e)
@@ -124,14 +135,18 @@ class SessionWrapper:
     __auth_token: str
 
     __config: dict
+    
+    __check_response_code: bool
 
     def __init__(self,
-                 config: dict):
+                 config: dict,
+                 check_response_code=True):
         self.__auth_user = config['auth_user']
         self.__auth_password = config['auth_password']
         self.__auth_token = config['auth_token']
         self.__config = config
         self.__session = None
+        self.__check_response_code = check_response_code
 
     @property
     def current(self) -> ClientSessionExt:
@@ -148,9 +163,11 @@ class SessionWrapper:
         self.__session.timeout_secs = self.__config['timeout_secs']
         self.__session.retries_codes = self.__config['retries_codes']
         self.__session.retries_delay_secs = self.__config['retries_delay_secs']
+        self.__session.check_response_code = self.__check_response_code
 
         return self.__session
 
     async def release(self):
         if self.__session is not None:
             await self.__session.close()
+            self.__session = None

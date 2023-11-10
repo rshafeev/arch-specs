@@ -16,7 +16,7 @@ class AppCore:
         self.args = args_parser.parse_args()
         self.__configuration = ConfigurationLoader.load(self.args.config)
         self.set_basic_logging()
-        GitSpecsRepositoryHelper.repo_path = self.args.specs_repo_path
+
 
     def set_basic_logging(self):
         logging.basicConfig(
