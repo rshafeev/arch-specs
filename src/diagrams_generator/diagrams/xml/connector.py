@@ -40,10 +40,11 @@ class XmlConnector(XmlObject):
         self.__create_xml_objects()
 
     def id_by_type(self, postfix: XmlElementType):
-        return "s#{}#to#{}#{}#{}".format(self.service_spec.service_name,
+        return "s#{}#to#{}#{}#{}#{}".format(self.service_spec.service_name,
                                       self.__connector.dest.service_name,
                                       self.__connector.data_direction,
-                                      postfix.name)
+                                      postfix.name,
+                                      self.__connector.transport)
 
     def __create_xml_objects(self):
         self.__create_group()
