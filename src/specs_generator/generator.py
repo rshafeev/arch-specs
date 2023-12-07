@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from typing import Optional
 
@@ -371,7 +372,6 @@ class SpecsGenerator:
                         tx_service_link = '{}/{}/'.format(wiki_link, wiki_space) + tx_service_specs.wiki_name
                     protocol = c["transport"]
                     if "protocol" in c:
-                        protocol = "{} (transport: {})".format(c["protocol"], c["transport"]) #todo: clean
                         protocol = c["protocol"]
                     row = {
                         "ServiceName": self.html_link(tx_service_link, tx_service_specs.wiki_name),

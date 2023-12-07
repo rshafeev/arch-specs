@@ -4,7 +4,6 @@ from typing import Tuple, Dict, List, Optional
 
 import validators
 from jsonschema import Draft202012Validator
-from jsonschema.validators import Draft7Validator
 
 from core.specs.validate.validator import Validator, SchemaType
 
