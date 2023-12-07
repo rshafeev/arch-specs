@@ -85,6 +85,9 @@ class ServicePropertiesView:
             "current_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             "dev_teams": self.__dev_teams_s(spec),
             "no_encryption": len(spec.support_encryption) == 0,
-            "encryption": spec.support_encryption
+            "encryption": spec.support_encryption,
+            "has_image": 'image' in spec.raw,
+            "image": spec.raw['image'] if 'image' in spec.raw else ""
+
         }
         return await self.__template.render_async(render_params)

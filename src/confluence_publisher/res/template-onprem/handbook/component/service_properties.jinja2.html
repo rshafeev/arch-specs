@@ -108,6 +108,12 @@
                 <th colspan="1">Source Code</th>
                 <td colspan="1">{{source_link}}</td>
             </tr>
+            {% if has_image %}
+            <tr>
+                <th colspan="1">Image</th>
+                <td colspan="1"><span>{{image}}</span></td>
+            </tr>
+            {% endif %}
             {% if has_language %}
             <tr>
                 <th colspan="1">Basic Language</th>
