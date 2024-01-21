@@ -33,8 +33,8 @@ class ServiceSpecExt(ServiceSpec):
                 owner_name = owner_name.strip()
                 try:
                     owner_key = await self.__user_keys_storage.get_user_key(owner_name)
-                except:
-                    pass
+                except Exception as e:
+                    logging.exception(e)
                 if owner_key is None:
                     logging.error("Could not find userKey for {}".format(owner_name))
                     raw['owner_keys'][owner_name] = None

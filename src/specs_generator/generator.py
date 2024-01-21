@@ -196,6 +196,7 @@ class SpecsGenerator:
         return rows
 
     def __producers_row(self, service: ServiceSpec, channel_name, output_row):
+        print(channel_name)
         if service.is_kafka_broker:
             channel = service.topics[channel_name]
         if service.is_celery_broker:
@@ -370,6 +371,8 @@ class SpecsGenerator:
                         wiki_link = self.services_specs.settings.confluence.link
                         wiki_space = self.services_specs.settings.confluence.space
                         tx_service_link = '{}/{}/'.format(wiki_link, wiki_space) + tx_service_specs.wiki_name
+                    print(tx_service_name)
+                    print(c)
                     protocol = c["transport"]
                     if "protocol" in c:
                         protocol = c["protocol"]

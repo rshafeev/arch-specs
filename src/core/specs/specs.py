@@ -3,6 +3,7 @@ import os
 from typing import Optional
 
 from core.specs.service.connector import ServiceSpecConnector, ChannelType
+from core.specs.service.rmq_connector import RmqServiceSpecConnector
 from core.specs.service.spec import ServiceSpec
 from core.yaml import read_yaml
 from core.git.branch import Branch
@@ -17,14 +18,14 @@ class ServicesSpecs:
 
     __services: dict
 
-    __current_banch: Branch
+    __current_branch: Branch
 
     __unavailable_services: dict
 
     __settings: Settings
 
-    def __init__(self, meta_path: str, topics_info_filename: str, current_banch: Branch):
-        self.__current_banch = current_banch
+    def __init__(self, meta_path: str, topics_info_filename: str, current_branch: Branch):
+        self.__current_branch = current_branch
         self.__settings = Settings(meta_path)
         self.row_services_specs = ServicesSpecs.upload_row_services_specs(meta_path, self.__settings)
         if os.path.isfile(topics_info_filename):
@@ -44,9 +45,9 @@ class ServicesSpecs:
         return out
 
     def __is_service_avaliable(self, service: ServiceSpec) -> bool:
-        if self.__current_banch.is_release and not service.is_release_service:
+        if self.__current_branch.is_release and not service.is_release_service:
             return False
-        if self.__current_banch.is_master and not service.is_master_service:
+        if self.__current_branch.is_master and not service.is_master_service:
             return False
         return service.is_master_service
 
@@ -72,7 +73,10 @@ class ServicesSpecs:
                 continue
             for c in source_spec.raw['connect_to']:
                 dest_spec = self.get_service_spec(c['name'])
-                connector = ServiceSpecConnector(c, source_spec, dest_spec)
+                if dest_spec.is_rabbitmq_broker:
+                    connector = RmqServiceSpecConnector(c, source_spec, dest_spec)
+                else:
+                    connector = ServiceSpecConnector(c, source_spec, dest_spec)
                 source_spec.connectors.append(connector)
 
 

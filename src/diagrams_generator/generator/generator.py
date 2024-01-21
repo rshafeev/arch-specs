@@ -7,6 +7,7 @@ from aiofile import AIOFile
 
 from core.git.branch import Branch
 from core.specs.specs import ServicesSpecs
+from diagrams.xml.rmq.rmq_topics_arrow import XmlRabbitmqTopicsArrow
 from diagrams_generator.diagrams.geometry import Position
 from diagrams_generator.diagrams.styles_wrapper import StyleSelector
 from diagrams_generator.diagrams.template import XmlTemplate
@@ -142,16 +143,17 @@ class Generator:
         for arrow in arrows:
             arrow.add_to_root(root_xml)
 
-    async def generate_xml_topic_arrows(self, root_xml: ET.Element, kafka_name='kafka'):
+    async def generate_xml_topic_arrows(self, root_xml: ET.Element):
         arrows = []
         topics = {}
+        return
         for service_name in self.xml_services:
             xml_service = self.xml_service(service_name)
             for direction in xml_service.topics_containers:
                 topics_container = xml_service.topics(direction)
+                if topics_container.is_rabbitmq_broker:
+                    continue
                 for topic in topics_container.topics:
-                    # if topic.broker_name != kafka_name:
-                    #     continue
                     if topic.name not in topics:
                         topics[topic.name] = {
                             'tx': [],
@@ -183,6 +185,74 @@ class Generator:
         for arrow in arrows:
             arrow.add_to_root(root_xml)
 
+    async def generate_xml_rmq_queues_arrows(self, root_xml: ET.Element):
+        arrows = []
+        topics = {}
+        for service_name in self.xml_services:
+            xml_service = self.xml_service(service_name)
+            for direction in xml_service.topics_containers:
+                topics_container = xml_service.topics(direction)
+                if not topics_container.is_rabbitmq_broker:
+                    continue
+                for topic in topics_container.topics:
+                    if topic.id not in topics:
+                        topics[topic.id] = topic
+
+        for topicA_id in topics:
+            topicA = topics[topicA_id]
+            for topicB_id in topics:
+                if topicA_id == topicB_id:
+                    continue
+                topicB = topics[topicB_id]
+                if topicA.rmq_channel.is_binding(topicB.rmq_channel):
+                   topics_direction = "tx"
+                   if topicA.rmq_channel.is_consume:
+                       topics_direction = "rx"
+
+                   arrow = XmlRabbitmqTopicsArrow(self.config, self.styles, topicA, topicB, topics_direction="rx",
+                                   style_name='service-topics-arrow', visible=False)
+                   arrows.append(arrow)
+                   arrow = XmlRabbitmqTopicsArrow(self.config, self.styles, topicA, topicB, topics_direction="tx",
+                                          style_name='service-topics-arrow', visible=False)
+                   arrows.append(arrow)
+
+        for arrow in arrows:
+            arrow.add_to_root(root_xml)
+
+                # for topic in topics_container.topics:
+                #     if topic.id not in topics:
+                #         topics[topic.id] = {
+                #             'tx': [],
+                #             'rx': []
+                #         }
+                #
+                    #topics[topic.name][topic.direction].append(topic)
+
+        # for topic_name in topics:
+        #     if len(topics[topic_name]['tx']) == 0 or len(topics[topic_name]['tx']) == 0:
+        #         for topic_tx in topics[topic_name]['tx']:
+        #             topic_tx.disable_link()
+        #         for topic_rx in topics[topic_name]['rx']:
+        #             topic_rx.disable_link()
+        #
+        #     for topic_tx in topics[topic_name]['tx']:
+        #         for topic_rx in topics[topic_name]['rx']:
+        #             topic_rx.set_producer_name(topic_tx.service_name)
+        #             if not topic_rx.has_link_destination or not topic_tx.has_link_destination:
+        #                 continue
+        #             if topic_tx.service_name == topic_rx.service_name:
+        #                 continue
+        #             arrow = XmlTopicsArrow(self.config, self.styles, topic_tx, topic_rx, topics_direction="tx",
+        #                                    style_name='service-topics-arrow')
+        #             arrows.append(arrow)
+        #             arrow = XmlTopicsArrow(self.config, self.styles, topic_tx, topic_rx, topics_direction="rx",
+        #                                    style_name='service-topics-arrow')
+        #             arrows.append(arrow)
+        #
+        # for arrow in arrows:
+        #     arrow.add_to_root(root_xml)
+
+
     async def generate_xml_connect_to_arrows(self, root_xml: ET.Element):
         arrows = []
         for service_name in self.xml_services:
@@ -205,6 +275,7 @@ class Generator:
     async def __add_xml_objects(self):
         await self.generate_xml_services(self.diagram_root_xml)
         await self.generate_xml_topic_arrows(self.diagram_root_xml)
+        await self.generate_xml_rmq_queues_arrows(self.diagram_root_xml)
         await self.generate_xml_topic_container_arrows(self.diagram_root_xml)
         await self.generate_xml_connect_to_arrows(self.diagram_root_xml)
 

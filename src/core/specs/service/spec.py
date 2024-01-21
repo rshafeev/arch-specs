@@ -10,6 +10,7 @@ from core.specs.settings import Settings
 class ServiceType(Enum):
     kafka = "kafka"
     activemq = "activemq"
+    rabbitmq = "rabbitmq"
     unknown = ""
 
 
@@ -96,6 +97,11 @@ class ServiceSpec:
         return self.type in [ServiceType.activemq.value]
 
     @property
+    def is_rabbitmq_broker(self) -> bool:
+        return self.type in [ServiceType.rabbitmq.value]
+
+
+    @property
     def is_celery_broker(self) -> bool:
         return 'used_as_celery' in self.__raw_spec and self.__raw_spec['used_as_celery'] is True
 
@@ -103,7 +109,8 @@ class ServiceSpec:
     def is_broker(self) -> bool:
         return (self.is_kafka_broker is True or
                 self.is_celery_broker is True  or
-                self.is_mq_broker is True)
+                self.is_mq_broker is True or
+                self.is_rabbitmq_broker is True)
 
     @property
     def settings(self) -> Settings:
@@ -207,6 +214,15 @@ class ServiceSpec:
         return raw['queues']
 
     @property
+    def exchanges(self) -> Optional[dict]:
+        if self.is_broker is False:
+            return None
+        raw = self.__raw_spec
+        if 'exchanges' not in raw:
+            return None
+        return raw['exchanges']
+
+    @property
     def celery_tasks(self) -> Optional[dict]:
         if self.is_broker is False:
             return None
@@ -220,8 +236,8 @@ class ServiceSpec:
             if connector.dest.service_name == connect_to_service_name and connector.data_direction == data_direction:
                 return connector
 
-    def get_topics_list(self, connect_to_service_name: str, data_direction: str) -> Optional[dict]:
-        c = self.get_connect_to(connect_to_service_name, data_direction)
-        if c is None or 'topics' not in c or c['topics'] is None:
-            return None
-        return c['topics']
+    # def get_topics_list(self, connect_to_service_name: str, data_direction: str) -> Optional[dict]:
+    #     c = self.get_connect_to(connect_to_service_name, data_direction)
+    #     if c is None or 'topics' not in c or c['topics'] is None:
+    #         return None
+    #     return c['topics']

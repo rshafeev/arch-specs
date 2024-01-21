@@ -22,6 +22,6 @@ class ApiUser(ApiBase):
                 if e['user']['publicName'].upper() == username.upper():
                     return e['user']['accountId']
             else:
-                if e['user']['displayName'].upper() == username.upper():
+                if e['user']['displayName'].upper() == username.upper() or e['user']['username'].upper() == username.upper():
                     return e['user']['userKey']
         return None

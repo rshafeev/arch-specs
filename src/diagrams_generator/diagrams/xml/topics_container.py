@@ -5,6 +5,7 @@ from typing import List
 from core.specs.service.connector import ServiceSpecConnector, ChannelType
 from core.specs.service.spec import ServiceSpec
 from core.specs.specs import ServicesSpecs
+from diagrams.xml.rmq.rmq_topic import XmlRabbitmqTopic
 from diagrams_generator.diagrams.geometry import Position, Geometry
 from diagrams_generator.diagrams.id_map import ID_MAP
 from diagrams_generator.diagrams.styles_wrapper import Style, StyleSelector
@@ -43,6 +44,18 @@ class XmlTopicsContainer(XmlObject):
     @property
     def broker_name(self) -> str:
         return self.__connector.dest.service_name
+
+    @property
+    def is_kafka_broker(self) -> bool:
+        return self.__connector.dest.is_kafka_broker
+
+    @property
+    def is_mq_broker(self) -> bool:
+        return self.__connector.dest.is_mq_broker
+
+    @property
+    def is_rabbitmq_broker(self) -> bool:
+        return self.__connector.dest.is_rabbitmq_broker
 
     @property
     def direction(self) -> str:
@@ -110,6 +123,8 @@ class XmlTopicsContainer(XmlObject):
                 label = "Consumer Tasks"
             elif self.__connector.dest.is_mq_broker:
                 label = "Consumer Queues"
+            elif self.__connector.dest.is_rabbitmq_broker:
+                label = "Consumer Queues"
 
         else:
             if self.__connector.dest.is_kafka_broker:
@@ -118,6 +133,9 @@ class XmlTopicsContainer(XmlObject):
                 label = "Producer Tasks"
             elif self.__connector.dest.is_mq_broker:
                 label = "Producer Queues"
+            elif self.__connector.dest.is_rabbitmq_broker:
+                label = "Producer Exchanges"
+
         if self.__connector.channel_type == ChannelType.other:
             label = label + " ({})".format(self.__connector.dest.service_name)
         label_w, label_h = TextPixelSize.text_dim(self.config, label, self.__label_style)
@@ -140,14 +158,23 @@ class XmlTopicsContainer(XmlObject):
         label_weight = float(self.xml(XmlElementType.topics_label).find("mxGeometry").attrib['width'])
         topic_width = label_weight
         for topic_name in self.__connector.channels:
-            kafka = self.__connector.dest
-            xml_topic = XmlTopic(self.config,
-                                 self.styles,
-                                 self.__spec,
-                                 kafka,
-                                 self.__connector,
-                                 topic_name,
-                                 self.parent)
+            broker = self.__connector.dest
+            if self.is_rabbitmq_broker:
+                xml_topic = XmlRabbitmqTopic(self.config,
+                                     self.styles,
+                                     self.__spec,
+                                     broker,
+                                     self.__connector,
+                                     topic_name,
+                                     self.parent)
+            else:
+                xml_topic = XmlTopic(self.config,
+                                     self.styles,
+                                     self.__spec,
+                                     broker,
+                                     self.__connector,
+                                     topic_name,
+                                     self.parent)
             if topic_width < xml_topic.min_width:
                 topic_width = xml_topic.min_width
             self.__xml_topics_objects.append(xml_topic)

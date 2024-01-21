@@ -4,7 +4,7 @@ from diagrams_generator.diagrams.xml.arrow.arrow import XmlArrow
 from diagrams_generator.diagrams.xml.topic import XmlTopic
 
 
-class XmlTopicsArrow(XmlArrow):
+class XmlRabbitmqTopicsArrow(XmlArrow):
     source: XmlTopic
 
     dest: XmlTopic
@@ -33,16 +33,14 @@ class XmlTopicsArrow(XmlArrow):
 
     @property
     def tags(self):
+        rexchange = self.source.name
         if self.topics_direction == 'rx':
-            tags = [ID_MAP.tag("broker#{}#topic#{}#l#rx".format(self.dest.broker_name,
-                                                       self.dest.name)),
-                    ID_MAP.tag("broker#{}#topic#{}#{}#l".format(self.dest.broker_name,
-                                                       self.dest.name,
-                                                       self.dest.service_name))
+            tags = [ID_MAP.tag(f"broker#{self.source.broker_name}#topic#{rexchange}#l#rx"),
+                    ID_MAP.tag(f"broker#{self.source.broker_name}#topic#{rexchange}#{self.dest.service_name}#l")
                     ]
         else:
-            tags = [ID_MAP.tag("broker#{}#topic#{}#l".format(self.source.broker_name,
-                                                    self.source.name))]
+            tags = [ID_MAP.tag(f"broker#{self.source.broker_name}#topic#{rexchange}#l#{self.source.service_name}")
+                    ]
         return tags
 
     @property

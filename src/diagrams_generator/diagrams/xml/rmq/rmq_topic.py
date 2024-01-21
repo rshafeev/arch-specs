@@ -12,7 +12,7 @@ from diagrams_generator.diagrams.text_pixel_size import TextPixelSize
 from diagrams_generator.diagrams.xml.object import XmlObject, XmlElementType
 
 
-class XmlTopic(XmlObject):
+class XmlRabbitmqTopic(XmlObject):
     __spec: ServiceSpec
 
     __connector: ServiceSpecConnector
@@ -112,16 +112,19 @@ class XmlTopic(XmlObject):
         toggle_tags = list()
         hide_tags = list()
         if self.__connector.data_direction == 'rx':
-            toggle_tags.append(ID_MAP.tag("broker#{}#topic#{}#{}#l".format(self.__connector.dest.service_name,
-                                                                  self.__channel_name,
-                                                                  self.service_name)))
-            hide_tags.append(ID_MAP.tag("broker#{}#topic#{}#l".format(self.__connector.dest.service_name,
-                                                             self.__channel_name)))
+            queue_name = self.rmq_channel.channel_dict['queue']
+            if queue_name in self.rmq_channel.dest.queues:
+                queue = self.rmq_channel.dest.queues[queue_name]
+                for bind_to in queue['binding']:
+                    rechange = bind_to['exchange']
+                    if 'routing_key' in bind_to and bind_to['routing_key'] != "":
+                        rechange = f"{rechange}/{bind_to['routing_key']}"
+                    toggle_tags.append(ID_MAP.tag(f"broker#{self.__connector.dest.service_name}#topic#{rechange}#{self.service_name}#l"))
+                    hide_tags.append(ID_MAP.tag(f"broker#{self.__connector.dest.service_name}#topic#{rechange}#l"))
         else:
-            toggle_tags.append(ID_MAP.tag("broker#{}#topic#{}#l".format(self.__connector.dest.service_name,
-                                                               self.__channel_name)))
-            hide_tags.append(ID_MAP.tag("broker#{}#topic#{}#l#rx".format(self.__connector.dest.service_name,
-                                                                self.__channel_name)))
+            rexchange = self.__channel_name
+            toggle_tags.append(ID_MAP.tag(f"broker#{self.__connector.dest.service_name}#topic#{rexchange}#l#{self.__connector.source.service_name}"))
+            hide_tags.append(ID_MAP.tag(f"broker#{self.__connector.dest.service_name}#topic#{rexchange}#l#rx"))
         link_actions = [
             {
                 "toggle": {
