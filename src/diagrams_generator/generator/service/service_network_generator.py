@@ -117,9 +117,17 @@ class ServiceNetworkGenerator(Generator):
                 all_services.append(service_name)
         columns[1].append(self.service.service_name)
         if len(all_services) > 0:
-            columns[0] = all_services[0:int(len(all_services) / 2)]
-            columns[2] = all_services[len(columns[0]):len(all_services)]
+            left_h = 0
+            right_h = 0
+            for service in all_services:
+                xml_service = self.xml_services[service_name]
 
+                if left_h <= right_h:
+                    columns[0].append(service)
+                    left_h = left_h + xml_service.geom.h
+                else:
+                    columns[2].append(service)
+                    right_h = right_h + xml_service.geom.h
         if len(columns[0]) + len(columns[2]) != len(all_services):
             raise Exception("Logic Error!")
 

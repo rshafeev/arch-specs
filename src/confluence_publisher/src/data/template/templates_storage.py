@@ -17,6 +17,7 @@ class HtmlComponentTemplateName(Enum):
 
 class HtmlPageTemplateName(Enum):
     entire_broker_links = auto()
+    entire_rmq_broker_links = auto()
     entire_links = auto()
     diagram = auto()
     system_network_branch_diagram = auto()
@@ -34,6 +35,7 @@ class HtmlPageTemplateName(Enum):
     network_current_links = auto()
     entire_service = auto()
     entire_service_kafka = auto()
+    entire_service_rmq = auto()
     entire_diagram = auto()
 
 

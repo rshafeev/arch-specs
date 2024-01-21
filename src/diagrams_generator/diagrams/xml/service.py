@@ -72,11 +72,15 @@ class XmlService(XmlObject):
         topics_container_props = self.styles.props['service-topics-container']
         x = topics_container_props['x_shift']
         y = topics_container_props['y_shift']
+
+        if self.spec.service_module in self.styles.props['service-core']['add_images_by_service_module']:
+            if 'y_image_shift' in self.styles.props['service-core']:
+                y = y + self.styles.props['service-core']['y_image_shift']
+
         if label_font_size_w > current_service_core_width - 25:
             y = y + 5 + label_font_size_h * 2
         else:
             y = y + 5 + label_font_size_h
-
         topics_geom = Geometry(x, y, 0, 0)
         topics_h_max = 0.0
         topics_w_max = 0.0
@@ -196,7 +200,7 @@ class XmlService(XmlObject):
 
     async def __create_container_label(self):
         props = self.styles.props['service-core']
-        label = self.spec.service_name
+        label = self.spec.full_name
         label_w, label_h = TextPixelSize.text_dim(self.config, label, self.__label_style)
 
         xml = ET.Element('UserObject')
@@ -293,7 +297,11 @@ class XmlService(XmlObject):
                 topics_container = XmlTopicsContainer(self.config, self.styles, self.spec, self.specs, connector, self)
                 self.topics_containers[topics_container.id] = topics_container
 
+        xml_connectors = {}
         for connector in self.spec.connectors:
+            if connector.dest.service_name in xml_connectors:
+                continue
+            xml_connectors[connector.dest.service_name] = {}
             xml_connector = XmlConnector(self.config, self.styles, self.spec, connector, self)
             self.__connectors.append(xml_connector)
 

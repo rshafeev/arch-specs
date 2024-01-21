@@ -1,9 +1,8 @@
-from core.specs.service.spec import ServiceSpec
 
 
 class Channel:
-    _source: ServiceSpec
-    _desc: ServiceSpec
+    _source: 'ServiceSpec'
+    _desc: 'ServiceSpec'
     _connect_to: dict
     _channel_dict: dict
 

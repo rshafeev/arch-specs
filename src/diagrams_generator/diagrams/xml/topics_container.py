@@ -113,6 +113,7 @@ class XmlTopicsContainer(XmlObject):
         self.set_xml(XmlElementType.topics, service_xml)
         self.__create_container_label()
         self.__create_topics()
+        self.__create_rmq_topics()
 
     def __create_container_label(self):
         props = self.styles.props['service-topics-container']
@@ -155,20 +156,13 @@ class XmlTopicsContainer(XmlObject):
         self.set_xml(XmlElementType.topics_label, mx_cell_xml)
 
     def __create_topics(self):
+        if self.is_rabbitmq_broker:
+            return
         label_weight = float(self.xml(XmlElementType.topics_label).find("mxGeometry").attrib['width'])
         topic_width = label_weight
         for topic_name in self.__connector.channels:
             broker = self.__connector.dest
-            if self.is_rabbitmq_broker:
-                xml_topic = XmlRabbitmqTopic(self.config,
-                                     self.styles,
-                                     self.__spec,
-                                     broker,
-                                     self.__connector,
-                                     topic_name,
-                                     self.parent)
-            else:
-                xml_topic = XmlTopic(self.config,
+            xml_topic = XmlTopic(self.config,
                                      self.styles,
                                      self.__spec,
                                      broker,
@@ -178,8 +172,37 @@ class XmlTopicsContainer(XmlObject):
             if topic_width < xml_topic.min_width:
                 topic_width = xml_topic.min_width
             self.__xml_topics_objects.append(xml_topic)
+
+
         for xml_topic in self.__xml_topics_objects:
             xml_topic.set_width(topic_width)
+
+    def __create_rmq_topics(self):
+        if not self.is_rabbitmq_broker:
+            return
+        label_weight = float(self.xml(XmlElementType.topics_label).find("mxGeometry").attrib['width'])
+        topic_width = label_weight
+        xml_topics_objects = []
+        for topic_name in self.__connector.channels:
+            broker = self.__connector.dest
+            xml_topic = XmlRabbitmqTopic(self.config,
+                                             self.styles,
+                                             self.__spec,
+                                             broker,
+                                             self.__connector,
+                                             topic_name,
+                                             self.parent)
+            if topic_width < xml_topic.min_width:
+                topic_width = xml_topic.min_width
+            xml_topics_objects.append(xml_topic)
+
+        topic_props = self.styles.props['service-topic']
+        topic_width_max = topic_props['width_max']
+
+        for xml_topic in xml_topics_objects:
+            xml_topic.set_width(min(topic_width_max,topic_width))
+
+        self.__xml_topics_objects.extend(xml_topics_objects)
 
     def set_position(self, position: Position):
         props = self.styles.props['service-topics-container']

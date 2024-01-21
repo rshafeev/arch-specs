@@ -34,6 +34,8 @@ class XmlRabbitmqTopic(XmlObject):
         self.__broker_service = broker_service
         self.__connector = connector
         self.__channel_name = channel_name
+        self.__display_channel_name = channel_name
+
         if self.topic_enable:
             self.__style = self.styles.topic_style(spec, connector, channel_name)
         else:
@@ -161,9 +163,9 @@ class XmlRabbitmqTopic(XmlObject):
         topic = self.__connector.channels[self.__channel_name]
         topic_object_id = self.id
         topic_xml = ET.Element('UserObject')
+        topic_xml.attrib['label'] = self.__channel_name
         topic_xml.attrib['id'] = ID_MAP.id(topic_object_id)
         topic_xml.attrib['tags'] = ID_MAP.tag(tag)
-        topic_xml.attrib['label'] = self.__channel_name
         topic_xml.attrib['Broker'] = self.__connector.dest.service_name
 
         if self.__connector.channel_type is ChannelType.exchange:
@@ -171,10 +173,28 @@ class XmlRabbitmqTopic(XmlObject):
             topic_xml.attrib['Exchange'] = str(channel['name'])
             if 'routing_key' in channel:
                 topic_xml.attrib['RoutingKey'] = str(channel['routing_key'])
+        if self.__connector.data_direction == "rx":
+            queue_name = self.rmq_channel.channel_dict["queue"]
+            topic_xml.attrib['Queue'] = queue_name
+            if queue_name in self.rmq_channel.dest.queues:
+                queue = self.rmq_channel.dest.queues[queue_name]
+                binging_s = ''
+                if 'binding' in queue and queue['binding'] is not None:
+                    for bind_to in queue['binding']:
+                        if binging_s != '':
+                            binging_s = binging_s + ', '
+                        binging_s = binging_s + f"{bind_to['exchange']}/"
+                        if 'routing_key' in bind_to:
+                            binging_s = binging_s + f"{bind_to['routing_key']}"
+                    topic_xml.attrib['Binding'] = binging_s
+                if queue is not None and 'desc' in queue and queue['desc'] is not None:
+                    topic_xml.attrib['Description'] = str(queue['desc'])
+        else:
+            if topic is not None and 'desc' in topic and topic['desc'] is not None:
+                topic_xml.attrib['Description'] = str(topic['desc'])
         if self.has_link_destination:
             topic_xml.attrib['link'] = "data:action/json,{}".format(json.dumps({"actions": self.link_actions}))
-        if topic is not None and 'desc' in topic and topic['desc'] is not None:
-            topic_xml.attrib['Description'] = str(topic['desc'])
+
 
         topic_mx_cell_xml = ET.Element('mxCell')
         topic_mx_cell_xml.attrib['style'] = str(self.__style)
@@ -202,30 +222,21 @@ class XmlRabbitmqTopic(XmlObject):
     @property
     def min_width(self):
         props = self.styles.props['service-topic']
-        max_text = 0
-        for txt in self.display_channel_name:
-            max_text = max(len(txt), max_text)
-        w, h = TextPixelSize.text_dim(self.config, txt, self.__style)
+        w, h = TextPixelSize.text_dim(self.config, self.__display_channel_name, self.__style)
         return w + props['x_shift'] + 7
 
     @property
     def height(self) -> int:
         props = self.styles.props['service-topic']
-        return int(props['height']) * len(self.display_channel_name)
+        return int(props['height'])
 
     @property
-    def display_channel_name(self) -> List[str]:
-        return [self.__channel_name]
-        props = self.styles.props['service-topic']
-        topic_width_max = props['width_max']
-        name_rows = []
-        for rows_count in range(3):
+    def display_name(self) -> str:
+        return self.__display_channel_name
 
-            w, h = TextPixelSize.text_dim(self.config, self.__channel_name, self.__style)
-            topic_width = w + props['x_shift'] + 7
-            if topic_width <= topic_width_max:
-                break
-        return name_rows
+    @display_name.setter
+    def display_name(self, value):
+        self.__display_channel_name = value
 
     @property
     def geom(self) -> Geometry:

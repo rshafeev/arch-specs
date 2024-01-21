@@ -162,6 +162,7 @@ class XmlTopic(XmlObject):
         topic_xml.attrib['tags'] = ID_MAP.tag(tag)
         topic_xml.attrib['label'] = self.__channel_name
         topic_xml.attrib['Broker'] = self.__connector.dest.service_name
+        topic_xml.attrib['Name'] = self.__channel_name
 
         if self.__connector.channel_type is ChannelType.exchange:
             channel = self.__connector.channels[self.__channel_name]

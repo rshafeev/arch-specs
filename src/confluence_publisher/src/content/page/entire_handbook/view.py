@@ -36,7 +36,9 @@ class EntireHandbookPageView:
         return current_content.html_s
 
     def __template(self, spec: ServiceSpecExt):
-        if spec.is_broker:
+        if spec.is_rabbitmq_broker:
+            template_name = HtmlPageTemplateName.entire_service_rmq
+        elif spec.is_broker:
             template_name = HtmlPageTemplateName.entire_service_kafka
         else:
             template_name = HtmlPageTemplateName.entire_service

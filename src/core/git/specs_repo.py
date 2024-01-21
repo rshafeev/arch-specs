@@ -50,3 +50,15 @@ class GitSpecsRepositoryHelper:
     @classmethod
     def tx_celery_tasks_fname(cls, service_name: str) -> str:
         return "{}/specs/{}/tx_celery_tasks.json".format(cls.repo_path, service_name)
+
+    @classmethod
+    def rmq_queues_fname(cls, service_name: str) -> str:
+        return "{}/specs/{}/rmq_queues.json".format(cls.repo_path, service_name)
+
+    @classmethod
+    def rmq_rx_queues_fname(cls, service_name: str) -> str:
+        return "{}/specs/{}/rx_rmq_queues.json".format(cls.repo_path, service_name)
+
+    @classmethod
+    def rmq_tx_queues_fname(cls, service_name: str) -> str:
+        return "{}/specs/{}/tx_rmq_queues.json".format(cls.repo_path, service_name)

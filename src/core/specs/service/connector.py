@@ -118,6 +118,8 @@ class ServiceSpecConnector:
 
     @property
     def offset_storage(self) -> Optional[str]:
+        if 'offset_storage' not in self._connect_to:
+            return None
         return self._connect_to["offset_storage"]
 
     @property

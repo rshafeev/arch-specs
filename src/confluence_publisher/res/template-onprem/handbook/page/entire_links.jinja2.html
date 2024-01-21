@@ -148,3 +148,72 @@
 </table>
 {% endif %}
 {% endif %}
+
+
+{% if has_service_rmq_queues %}
+<h3>Rabbitmq Broker Usage</h3>
+{% if has_service_rx_rmq_queues %}
+<h4>Consumer Queues</h4>
+<table data-layout="default" ac:local-id="0d3073cb-69a9-4226-b32d-e3a6f7200ef4">
+    <colgroup>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+    </colgroup>
+    <tbody>
+    <tr>
+        <th><p><strong>Broker</strong></p></th>
+        <th><p><strong>Queue</strong></p></th>
+        <th><p><strong>Binding(Exchange / Routing Key)</strong></p></th>
+        <th><p><strong>Description</strong></p></th>
+        <th><p><strong>Protocol</strong></p></th>
+        <th><p><strong>Producers</strong></p></th>
+        <th><p><strong>Consumers</strong></p></th>
+    </tr>
+    {% for row in rx_rmq_queues_rows %}
+    <tr>
+        <td><p>{{row['Broker']}}</p></td>
+        <td><p>{{row['Queue']}}</p></td>
+        <td><p>{{row['Binding(Exchange / Routing Key)']}}</p></td>
+        <td><p>{{row['Description']}}</p></td>
+        <td><p>{{row['Protocol']}}</p></td>
+        <td><p>{{row['Producers']}}</p></td>
+        <td><p>{{row['Consumers']}}</p></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if has_service_tx_rmq_queues %}
+<h4>Producer Exchanges</h4>
+<table data-layout="default" ac:local-id="0d3073cb-69a9-4226-b32d-e3a6f7200ef4">
+    <colgroup>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+        <col style="width: 226.67px;"/>
+    </colgroup>
+    <tbody>
+    <tr>
+        <th><p><strong>Broker</strong></p></th>
+        <th><p><strong>Exchange / Routing Key</strong></p></th>
+        <th><p><strong>Binding Queue</strong></p></th>
+        <th><p><strong>Description</strong></p></th>
+        <th><p><strong>Protocol</strong></p></th>
+        <th><p><strong>Producers</strong></p></th>
+        <th><p><strong>Consumers</strong></p></th>
+    </tr>
+    {% for row in tx_rmq_queues_rows %}
+    <tr>
+        <td><p>{{row['Broker']}}</p></td>
+        <td><p>{{row['Exchange / Routing Key']}}</p></td>
+        <td><p>{{row['Binding Queue']}}</p></td>
+        <td><p>{{row['Description']}}</p></td>
+        <td><p>{{row['Protocol']}}</p></td>
+        <td><p>{{row['Producers']}}</p></td>
+        <td><p>{{row['Consumers']}}</p></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endif %}

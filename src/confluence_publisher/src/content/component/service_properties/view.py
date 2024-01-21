@@ -3,6 +3,7 @@ from typing import Optional
 from jinja2 import Template
 from data.specs.service_spec_ext import ServiceSpecExt
 from data.template.templates_storage import HtmlTemplatesStorage, HtmlComponentTemplateName
+import markdown2
 
 
 class ServicePropertiesView:
@@ -66,6 +67,24 @@ class ServicePropertiesView:
             teams_s = teams_s + " " + team['name']
         return teams_s
 
+    def _set_apidocs(self, render_params: dict, spec: ServiceSpecExt):
+        apidocs_s = ""
+        for interface in spec.apidocs:
+            apidoc = spec.apidocs[interface]
+            if 'swagger' in apidoc:
+                swagger_html = f"<p><a href=\"{apidoc['swagger']}\">Swagger API Docs.</a></p>"
+                if len(apidocs_s) > 0:
+                    apidocs_s = apidocs_s + " "
+                apidocs_s = apidocs_s + f"{swagger_html}"
+        render_params["apidocs"] = apidocs_s
+        render_params["has_apidocs"] = len(apidocs_s) > 0
+
+
+    def markdown2html(self, md_template_text: str) -> str:
+        j2_template = Template(md_template_text)
+        md_text = j2_template.render()
+        return markdown2.markdown(md_text)
+
     async def render(self, spec: ServiceSpecExt) -> str:
         settings = spec.settings
         render_params = {
@@ -85,9 +104,10 @@ class ServicePropertiesView:
             "current_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             "dev_teams": self.__dev_teams_s(spec),
             "no_encryption": len(spec.support_encryption) == 0,
+            "has_encryption": 'encryption' in spec.raw,
             "encryption": spec.support_encryption,
             "has_image": 'image' in spec.raw,
             "image": spec.raw['image'] if 'image' in spec.raw else ""
-
         }
+        self._set_apidocs(render_params, spec)
         return await self.__template.render_async(render_params)

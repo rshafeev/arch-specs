@@ -53,17 +53,21 @@ class DiagramPublisher:
 
     async def __prepare_page(self,
                              page: ConfluencePage,
-                             parent_page: ConfluencePage,
+                             parent_page_id: int,
                              current_branch: Branch) -> ConfluencePage:
 
         page.space_key = self.wiki_space
-        page.parent_id = parent_page.id
+        page.parent_id = parent_page_id
         page.body = await self.__page_view.render(current_branch)
         return page
 
     async def publish(self) -> ConfluencePage:
-        parent_title = self.__diagram_settings["parent_page"]
-        parent_page = await self.__confluence.pages.find(parent_title, self.wiki_space)
+        if 'parent_page_id' not in self.__diagram_settings:
+            parent_title = self.__diagram_settings["parent_page"]
+            parent_page = await self.__confluence.pages.find(parent_title, self.wiki_space)
+            parent_page_id = parent_page.id
+        else:
+            parent_page_id = self.__diagram_settings["parent_page_id"]
         page = await self.__confluence.pages.find(self.title, self.wiki_space)
         if page is None and not self.__branch.is_master and not self.__branch.is_release:
             raise Exception(f'''You try to create '{self.title}' page from the non-master/non-release branch '{self.__branch.name}'!
@@ -72,7 +76,7 @@ class DiagramPublisher:
         if page is None:
             page = ConfluencePage()
             page.title = self.title
-        page = await self.__prepare_page(page, parent_page, self.__branch)
+        page = await self.__prepare_page(page, parent_page_id, self.__branch)
         if page.id:
             await self.__confluence.pages.update(page)
             logging.info("Component Page '{}' was updated.".format(page.title))

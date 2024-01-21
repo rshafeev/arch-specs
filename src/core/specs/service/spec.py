@@ -3,6 +3,7 @@ from ctypes import Array
 from enum import Enum, auto
 from typing import Optional, List
 
+from core.specs.service.channel.rmq_channel import RabbitmqChannel
 from core.specs.service.connector import ServiceSpecConnector
 from core.specs.settings import Settings
 
@@ -139,6 +140,12 @@ class ServiceSpec:
         return self.__raw_spec["dev_team"]
 
     @property
+    def full_name(self) -> str:
+        if "full_name" not in self.__raw_spec:
+            return self.service_name
+        return self.__raw_spec["full_name"]
+
+    @property
     def raw(self) -> Optional[dict]:
         if self.__raw_spec is None:
             raise Exception(
@@ -152,6 +159,37 @@ class ServiceSpec:
     @property
     def internal_storages(self) -> dict:
         return self.__raw_spec['internal_storage']
+
+    ##     interfaces:
+    # http:
+    # desc:
+    # apidocs:
+    # - desc: Ground Station
+    # swagger: "[Ground Station Swagger](https://dev2-mcc.1440.space/api-docs/swagger-ui/index.html?urls.primaryName=Ground%20Station)"
+##
+    @property
+    def apidocs(self) -> dict:
+        if 'interfaces' not in self.raw:
+            return {}
+        apidocs_dict = {}
+        print(self.service_name)
+        for interface_name in self.raw['interfaces']:
+            interface = self.raw['interfaces'][interface_name]
+            apidocs_dict[interface_name] = {}
+            if interface is not None and 'apidocs' in interface:
+                apidocs = interface['apidocs']
+                if isinstance(apidocs, List):
+                    apidoc_s = ''
+                    for apidoc in apidocs:
+                        if 'swagger' in apidoc:
+                            if len(apidoc_s) > 0:
+                                apidoc_s = apidoc_s + ", "
+                            apidoc_s = apidoc_s + apidoc['swagger']
+                    apidocs_dict[interface_name]["swagger"] = apidoc_s
+        return apidocs_dict
+
+
+
 
     @raw.setter
     def raw(self, value: dict):
@@ -194,6 +232,22 @@ class ServiceSpec:
         if queue_name in raw['queues']:
             return raw['queues'][queue_name]
         return None
+
+    def get_binding_rabbitmq_queues(self, channel: dict) -> List[dict]:
+        if not self.is_rabbitmq_broker:
+            return []
+        binding_queues = []
+        for queue_name in self.queues:
+            queue = self.queue(queue_name)
+            queue['name'] = queue_name
+            if 'binding' not in queue:
+                continue
+            for binding in queue['binding']:
+                if binding['exchange'] != channel['exchange']:
+                    continue
+                if RabbitmqChannel.is_routing_key_binding(channel, binding):
+                    binding_queues.append(queue)
+        return binding_queues
 
     @property
     def topics(self) -> Optional[dict]:

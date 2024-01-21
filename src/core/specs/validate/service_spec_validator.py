@@ -117,7 +117,6 @@ class ServiceSpecValidator(Validator):
                                     })
 
     def __check_connect_to_name(self, service_key: str, service_spec: dict, errors: List):
-        print(service_key)
         if "connect_to" not in service_spec:
             return
         for connect_to in service_spec["connect_to"]:

@@ -2,7 +2,6 @@ from typing import Optional
 
 from core.specs.service.channel.channel import Channel
 from core.specs.service.connector import ChannelType
-from core.specs.service.spec import ServiceSpec
 
 
 class RabbitmqChannel(Channel):
@@ -20,7 +19,8 @@ class RabbitmqChannel(Channel):
         return self._connect_to['data_direction'] == 'rx'
 
 
-    def is_routing_key_binding(self, keyProducer: dict, keyConsumer: dict) -> bool:
+    @staticmethod
+    def is_routing_key_binding(keyProducer: dict, keyConsumer: dict) -> bool:
         if 'routing_key' not in keyProducer or keyProducer['routing_key'] == "":
             return True
         if 'routing_key' not in keyConsumer or keyConsumer['routing_key'] == "":

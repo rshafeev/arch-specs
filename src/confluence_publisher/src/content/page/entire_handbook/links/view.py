@@ -17,7 +17,9 @@ class EntireLinksView:
         self.__html_templates_storage = html_templates_storage
 
     def __template(self, spec: ServiceSpecExt):
-        if spec.is_broker:
+        if spec.is_rabbitmq_broker:
+            template_name = HtmlPageTemplateName.entire_rmq_broker_links
+        elif spec.is_broker:
             template_name = HtmlPageTemplateName.entire_broker_links
         else:
             template_name = HtmlPageTemplateName.entire_links
@@ -32,6 +34,13 @@ class EntireLinksView:
             topics_json_name = GitSpecsRepositoryHelper.topics_fname(spec.service_name)
             with open(topics_json_name) as f:
                 topics_table = json.loads(f.read())
+
+        rmq_queues_table = []
+        if spec.is_rabbitmq_broker:
+            rmq_queues_json_name = GitSpecsRepositoryHelper.rmq_queues_fname(spec.service_name)
+            with open(rmq_queues_json_name) as f:
+                rmq_queues_table = json.loads(f.read())
+
         celery_tasks_table = []
         if spec.is_celery_broker:
             celery_tasks_json_name = GitSpecsRepositoryHelper.celery_tasks_fname(spec.service_name)
@@ -62,21 +71,40 @@ class EntireLinksView:
             with open(tx_topics_json_name) as f:
                 tx_topics_table = json.loads(f.read())
 
+        rx_rmq_queues_table = []
+        rx_rmq_queues_json_name = GitSpecsRepositoryHelper.rmq_rx_queues_fname(spec.service_name)
+        if os.path.isfile(rx_rmq_queues_json_name):
+            with open(rx_rmq_queues_json_name) as f:
+                rx_rmq_queues_table = json.loads(f.read())
+
+        tx_rmq_queues_table = []
+        tx_rmq_queues_json_name = GitSpecsRepositoryHelper.rmq_tx_queues_fname(spec.service_name)
+        if os.path.isfile(tx_rmq_queues_json_name):
+            with open(tx_rmq_queues_json_name) as f:
+                tx_rmq_queues_table = json.loads(f.read())
+
         render_params = {
             "service_name": spec.service_name,
             "has_internal_storages": "internal_storage" in spec.raw and spec.raw["internal_storage"] is not None,
             "table_rows": network_table,
             "topics_rows": topics_table,
+            "rmq_queues_rows": rmq_queues_table,
             "celery_tasks_rows": celery_tasks_table,
             "rx_celery_tasks_rows": rx_celery_tasks_table,
             "tx_celery_tasks_rows": tx_celery_tasks_table,
             "rx_topics_rows": rx_topics_table,
             "tx_topics_rows": tx_topics_table,
+            "rx_rmq_queues_rows": rx_rmq_queues_table,
+            "tx_rmq_queues_rows": tx_rmq_queues_table,
             "has_topics": len(topics_table) > 0,
+            "has_rmq_queues": len(rmq_queues_table) > 0,
             "has_celery_tasks": len(celery_tasks_table) > 0,
             "has_service_topics": len(rx_topics_table) + len(tx_topics_table)> 0,
             "has_service_rx_topics": len(rx_topics_table) > 0,
             "has_service_tx_topics": len(tx_topics_table) > 0,
+            "has_service_rmq_queues": len(rx_rmq_queues_table) + len(tx_rmq_queues_table)> 0,
+            "has_service_rx_rmq_queues": len(rx_rmq_queues_table) > 0,
+            "has_service_tx_rmq_queues": len(tx_rmq_queues_table) > 0,
             "has_service_celery_tasks": len(rx_celery_tasks_table) + len(tx_celery_tasks_table) > 0,
             "has_service_rx_celery_tasks": len(rx_celery_tasks_table) > 0,
             "has_service_tx_celery_tasks": len(tx_celery_tasks_table) > 0
