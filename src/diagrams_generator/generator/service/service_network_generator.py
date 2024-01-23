@@ -41,11 +41,17 @@ class ServiceNetworkGenerator(Generator):
         async with AIOFile(diagram_dir + '/network_diagram.xml', "w+") as out:
             await out.write(xmlstr.decode("utf8"))
 
+    async def __highlight_rmq_topics(self):
+        selected_service_topics = {}
+        selected_xml_service = self.xml_service(self.service.service_name)
+
     async def __highlight_topics(self):
         selected_service_topics = {}
         selected_xml_service = self.xml_service(self.service.service_name)
         for direction in selected_xml_service.topics_containers:
             topics_container = selected_xml_service.topics(direction)
+            if not topics_container.is_kafka_broker:
+                continue
             for topic in topics_container.topics:
                 selected_service_topics[topic.name] = {}
 
@@ -53,6 +59,8 @@ class ServiceNetworkGenerator(Generator):
             xml_service = self.xml_service(service_name)
             for direction in xml_service.topics_containers:
                 topics_container = xml_service.topics(direction)
+                if not topics_container.is_kafka_broker:
+                    continue
                 for topic in topics_container.topics:
                     if topic.has_link and topic.name in selected_service_topics:
                         style = self.styles_.topic_with_link_style(topic.direction)
@@ -73,6 +81,10 @@ class ServiceNetworkGenerator(Generator):
                 if connector.has_channels is False:
                     continue
                 broker = connector.dest
+                if broker.is_rabbitmq_broker:
+                    producers_list.extend(list(connector.producer_services))
+                    consumers_list.extend(list(connector.consumer_services))
+                    continue
                 for channel_name in connector.channels:
                     if connector.channel_type == ChannelType.celery_task:
                         channel = broker.celery_task(channel_name)

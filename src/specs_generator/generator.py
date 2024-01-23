@@ -170,8 +170,6 @@ class SpecsGenerator:
             return []
         rows = []
 
-        print(service.apidocs)
-
         for connector in service.connectors:
             if connector.data_direction == direction:
                 broker = connector.dest

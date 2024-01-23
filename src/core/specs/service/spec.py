@@ -160,33 +160,11 @@ class ServiceSpec:
     def internal_storages(self) -> dict:
         return self.__raw_spec['internal_storage']
 
-    ##     interfaces:
-    # http:
-    # desc:
-    # apidocs:
-    # - desc: Ground Station
-    # swagger: "[Ground Station Swagger](https://dev2-mcc.1440.space/api-docs/swagger-ui/index.html?urls.primaryName=Ground%20Station)"
-##
     @property
     def apidocs(self) -> dict:
         if 'interfaces' not in self.raw:
             return {}
-        apidocs_dict = {}
-        print(self.service_name)
-        for interface_name in self.raw['interfaces']:
-            interface = self.raw['interfaces'][interface_name]
-            apidocs_dict[interface_name] = {}
-            if interface is not None and 'apidocs' in interface:
-                apidocs = interface['apidocs']
-                if isinstance(apidocs, List):
-                    apidoc_s = ''
-                    for apidoc in apidocs:
-                        if 'swagger' in apidoc:
-                            if len(apidoc_s) > 0:
-                                apidoc_s = apidoc_s + ", "
-                            apidoc_s = apidoc_s + apidoc['swagger']
-                    apidocs_dict[interface_name]["swagger"] = apidoc_s
-        return apidocs_dict
+        return self.raw['interfaces']
 
 
 

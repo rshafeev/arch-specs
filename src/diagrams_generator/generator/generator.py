@@ -93,7 +93,10 @@ class Generator:
         service_categories_seq = self.services_specs.service_categories.all
         column_services_h = 0
         column_services_cnt = 0
-        column_services_h_max = 1200
+        if "column_height_max" in self.styles.props["system"]:
+            column_services_h_max = self.styles.props["system"]["column_height_max"]
+        else:
+            column_services_h_max = 1200
         column_services_cnt_max = self.styles.props["system"]["column_services_cnt_max"]
         max_column_w = 0
         x = 0
@@ -146,7 +149,6 @@ class Generator:
     async def generate_xml_topic_arrows(self, root_xml: ET.Element):
         arrows = []
         topics = {}
-        return
         for service_name in self.xml_services:
             xml_service = self.xml_service(service_name)
             for direction in xml_service.topics_containers:

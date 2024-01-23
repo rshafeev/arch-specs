@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Set
 import core.specs.service
 from core.specs.service.channel.rmq_channel import RabbitmqChannel
 from core.specs.service.connector import ServiceSpecConnector, ChannelType
@@ -55,3 +55,47 @@ class RmqServiceSpecConnector(ServiceSpecConnector):
     def channel_obj(self, channel_name) -> RabbitmqChannel:
         channel_dict = self.channels[channel_name]
         return RabbitmqChannel(self._connect_to, self.source, self.dest, channel_dict)
+
+    @property
+    def consumer_services(self) -> Set[str]:
+        broker = self.dest
+        if not broker.is_rabbitmq_broker:
+            return set()
+        services = set()
+        broker_queues = broker.queues
+        for channel_name in self.channels:
+            channel = self.channel_obj(channel_name)
+            if channel.is_produce:
+                produce_exchange = channel.channel_dict['exchange']
+                for queue_name in broker_queues:
+                    queue = broker_queues[queue_name]
+                    if 'binding' not in queue:
+                        continue
+                    if queue['binding'] is None:
+                        continue
+                    bindings = queue['binding']
+                    for binding in bindings:
+                        if produce_exchange != binding['exchange']:
+                            continue
+                        if channel.is_routing_key_binding(produce_exchange, binding):
+                          for service_name in queue['rx']:
+                              services.add(service_name)
+        return services
+
+    @property
+    def producer_services(self) -> Set[str]:
+        broker = self.dest
+        if not broker.is_rabbitmq_broker:
+            return set()
+        services = set()
+        broker_queues = broker.queues
+        for channel_name in self.channels:
+            channel = self.channel_obj(channel_name)
+            if channel.is_consume:
+                queue_name = channel.channel_dict['queue']
+                if queue_name not in broker_queues:
+                    continue
+                queue = broker_queues[queue_name]
+                for service_name in queue['tx']:
+                    services.add(service_name)
+        return services

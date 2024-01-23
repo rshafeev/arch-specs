@@ -64,18 +64,35 @@ class ServicePropertiesView:
             return ""
         teams_s = ""
         for team in spec.dev_teams:
-            teams_s = teams_s + " " + team['name']
+            if 'link' in team:
+                team_s = f"<p><a href=\"{team['link']}\">{team['name']}</a></p>"
+                teams_s = teams_s + team_s
+            else:
+                teams_s = teams_s + " " + team['name']
         return teams_s
 
     def _set_apidocs(self, render_params: dict, spec: ServiceSpecExt):
         apidocs_s = ""
         for interface in spec.apidocs:
-            apidoc = spec.apidocs[interface]
-            if 'swagger' in apidoc:
-                swagger_html = f"<p><a href=\"{apidoc['swagger']}\">Swagger API Docs.</a></p>"
+            apidocs = spec.apidocs[interface]
+            if (apidocs is None or 'apidocs' not in apidocs or
+                    apidocs['apidocs'] is None):
                 if len(apidocs_s) > 0:
                     apidocs_s = apidocs_s + " "
-                apidocs_s = apidocs_s + f"{swagger_html}"
+                continue
+            apidoc_list = apidocs['apidocs']
+            for apidoc in apidoc_list:
+                if 'swagger' in apidoc:
+                    swagger_html = f"<p><a href=\"{apidoc['swagger']}\">Swagger API Docs.</a></p>"
+                    if len(apidocs_s) > 0:
+                        apidocs_s = apidocs_s + " "
+                    apidocs_s = apidocs_s + f"{swagger_html}"
+                if interface == "grpc":
+                    grpc_interface_html = f"<p><a href=\"{apidoc['protocol']}\">grpc:{apidoc['service']}</a></p>"
+                    if len(apidocs_s) > 0:
+                        apidocs_s = apidocs_s + " "
+                    apidocs_s = apidocs_s + f"{grpc_interface_html}"
+
         render_params["apidocs"] = apidocs_s
         render_params["has_apidocs"] = len(apidocs_s) > 0
 
