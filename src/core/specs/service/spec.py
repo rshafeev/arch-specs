@@ -78,7 +78,7 @@ class ServiceSpec:
     @property
     def service_module(self) -> str:
         if 'module' not in self.__raw_spec:
-            print('error')
+            logging.error('error')
         return self.__raw_spec['module']
 
     @property
