@@ -500,7 +500,6 @@ class SpecsGenerator:
                         wiki_link = self.services_specs.settings.confluence.link
                         wiki_space = self.services_specs.settings.confluence.space
                         tx_service_link = '{}/{}/'.format(wiki_link, wiki_space) + tx_service_specs.wiki_name
-                    print(service_name)
                     protocol = c["transport"]
                     if "protocol" in c:
                         protocol = c["protocol"]
