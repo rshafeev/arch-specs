@@ -10,6 +10,7 @@ and diagrams from structured information about your services to publish them to 
 * __specs_generator__ - generates specifications in `.json` format.
 * __confluence_publisher__ - publishes arch. specifications and diagrams to Confluence.
 
+
 ![](docs/images/workflow.png)
 `arch-specs` tools were added to gitlab-ci pipeline to publish new changes of specifications 
 from master/release branches. 
